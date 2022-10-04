@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+*.d.ts
+node_modules
+coverage
+package-lock.json
+npm-debug.log*
+
+# production
+/build

@@ -1,2 +1,2 @@
-# leapp-browser-extension
-Repository for the Leapp Cross-Browser Extension
+# Leapp Multi Console Extension
+Repository for the Leapp Cross-Browser Multi Console Extension
