@@ -9,5 +9,5 @@ module.exports = {
     "!**/node_modules/**",
     "!**/vendor/**",
   ],
-  coverageDirectory: "src/coverage"
+  coverageDirectory: "coverage"
 };
