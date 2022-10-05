@@ -19,11 +19,11 @@
     "prepare": "husky install"
   },
   "devDependencies": {
-    "@angular-eslint/builder": "13.1.0",
-    "@angular-eslint/eslint-plugin": "13.1.0",
-    "@angular-eslint/eslint-plugin-template": "13.1.0",
-    "@angular-eslint/schematics": "13.1.0",
-    "@angular-eslint/template-parser": "13.1.0",
+    "@angular-eslint/builder": "14.1.2",
+    "@angular-eslint/eslint-plugin": "14.1.2",
+    "@angular-eslint/eslint-plugin-template": "14.1.2",
+    "@angular-eslint/schematics": "14.1.2",
+    "@angular-eslint/template-parser": "14.1.2",
     "@types/node": "^17.0.23",
     "@types/chrome": "^0.0.197",
     "@types/prettier": "2.6.0",
