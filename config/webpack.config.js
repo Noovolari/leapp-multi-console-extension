@@ -1,19 +1,72 @@
 "use strict";
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const { merge } = require("webpack-merge");
-
-const common = require("./webpack.common.js");
+const IMAGE_TYPES = /\.(png|jpe?g|gif|svg)$/i;
 const PATHS = require("./paths");
 
-// Merge webpack configuration files
-const config = (env, argv) =>
-  merge(common, {
-    entry: {
-      popup: PATHS.src + "/frontend/popup.js",
-      contentScript: PATHS.src + "/backend/contentScript.ts",
-      background: PATHS.src + "/backend/background.ts",
-    },
-    devtool: argv.mode === "production" ? false : "source-map",
-  });
-
-module.exports = config;
+module.exports = (env, argv) => ({
+  entry: {
+    popup: PATHS.src + "/frontend/popup.js",
+    contentScript: PATHS.src + "/backend/contentScript.ts",
+    background: PATHS.src + "/backend/index.ts",
+  },
+  output: {
+    // the build folder to output bundles and assets in.
+    path: PATHS.build,
+    // the filename template for entry chunks
+    filename: "[name].js",
+  },
+  devtool: argv.mode === "production" ? false : "source-map",
+  resolve: {
+    extensions: ['.js', '.ts', '.tsx'],
+  },
+  stats: {
+    all: false,
+    errors: true,
+    builtAt: true,
+    assets: true,
+    excludeAssets: [IMAGE_TYPES],
+  },
+  module: {
+    rules: [
+      // Help webpack in understanding CSS files imported in .js files
+      {
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      // Check for images imported in .js files and
+      {
+        test: IMAGE_TYPES,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              outputPath: "images",
+              name: "[name].[ext]",
+            },
+          },
+        ],
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+  plugins: [
+    // Copy static assets from `public` folder to `build` folder
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "./manifest.json" },
+        { from: "**/*", context: "asset" },
+        { from: "**/*", context: "src/frontend"},
+      ],
+    }),
+    // Extract CSS into separate files
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+    }),
+  ],
+});

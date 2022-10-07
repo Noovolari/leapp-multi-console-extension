@@ -11,12 +11,16 @@
 html {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
     sans-serif;
-  color: #222;
+  color: antiquewhite;
 }
 
 body {
-  width: 350px;
-  height: 300px;
+  width: 250px;
+  height: 400px;
+}
+
+.separator {
+  color: #404040;
 }
 
 .app {
@@ -27,6 +31,7 @@ body {
   flex-direction: column;
   text-align: center;
   padding: 20px;
+  background-color: #1F1D1E;
 }
 
 .title {
