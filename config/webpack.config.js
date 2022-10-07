@@ -70,3 +70,6 @@ module.exports = (env, argv) => ({
     }),
   ],
 });
+
+//OPZIONI
+//versione/connessione - porta - tema

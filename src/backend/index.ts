@@ -1,3 +1,5 @@
-import { background } from "./background";
+import { WebsocketService } from "./websocket.service";
 
-background(chrome);
+const webSocketService = new WebsocketService();
+
+webSocketService.listen();
