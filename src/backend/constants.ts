@@ -1,2 +1,2 @@
 export const separatorToken = "##";
-export const genericToken = `${separatorToken}LEAPP${separatorToken}`;
+export const leappToken = `${separatorToken}LEAPP${separatorToken}`;

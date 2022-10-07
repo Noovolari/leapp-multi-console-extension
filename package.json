@@ -32,6 +32,7 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@types/chrome": "^0.0.197",
+    "@types/firefox-webext-browser": "^94.0.1",
     "@types/jest": "^28.0.8",
     "@types/node": "^17.0.23",
     "@types/prettier": "2.6.0",
