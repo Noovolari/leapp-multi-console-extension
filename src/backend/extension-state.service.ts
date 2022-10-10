@@ -20,7 +20,7 @@ export class ExtensionStateService {
   }
 
   // Return the numeric id only
-  getTabSessionId(tabId: number): number {
+  getSessionIdByTabId(tabId: number): number {
     return this.hashedSessions[tabId];
   }
 
@@ -29,12 +29,12 @@ export class ExtensionStateService {
     this.sessionDictionary[sessionKey] = [];
   }
 
-  addTab(tabId: number, sessionId: number) {
+  addTabToSession(tabId: number, sessionId: number) {
     this.hashedSessions[tabId] = sessionId;
     this.sessionDictionary[`session-${sessionId}`].push(tabId);
   }
 
-  removeTab(tabIdToRemove: number) {
+  removeTabFromSession(tabIdToRemove: number) {
     const tabSessionName = this.getTabSessionName(tabIdToRemove);
     this.sessionDictionary[tabSessionName] = this.sessionDictionary[tabSessionName].filter((tabId) => tabId !== tabIdToRemove);
     delete this.hashedSessions[tabIdToRemove];

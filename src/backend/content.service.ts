@@ -11,7 +11,7 @@ export class ContentService {
         if (message.request == "get-ses-num") {
           if (port.sender.tab) {
             let sessionToken = "";
-            const sessionId = this.state.getTabSessionId(port.sender.tab.id);
+            const sessionId = this.state.getSessionIdByTabId(port.sender.tab.id);
             if (sessionId !== 0 && sessionId) {
               sessionToken = `${constants.leappToken}${sessionId}${constants.separatorToken}`;
             }

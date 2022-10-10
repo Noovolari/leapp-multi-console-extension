@@ -7,11 +7,11 @@ import { ContentService } from "./content.service";
 
 const extensionStateService = new ExtensionStateService(navigator);
 
+const tabControllerService = new TabControllerService(chrome, browser, extensionStateService);
+tabControllerService.listen();
+
 const bootstrapService = new BootstrapService(window, chrome, extensionStateService);
 bootstrapService.listen();
-
-const tabControllerService = new TabControllerService(chrome.tabs, extensionStateService);
-tabControllerService.listen();
 
 if (extensionStateService.isChrome) {
   const webRequestService = new WebRequestService(chrome.webRequest, extensionStateService);

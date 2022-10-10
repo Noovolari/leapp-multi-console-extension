@@ -11,7 +11,7 @@ export class WebRequestService {
       (data: WebRequestHeadersDetails) => {
         const tabId = data.tabId;
         if (tabId > 0) {
-          const tabSessionId = this.state.getTabSessionId(tabId);
+          const tabSessionId = this.state.getSessionIdByTabId(tabId);
           const requestHeaders = data.requestHeaders;
           if (tabSessionId !== 0 && tabSessionId !== undefined) {
             for (const headerKey in requestHeaders) {
@@ -57,7 +57,7 @@ export class WebRequestService {
         const tabId = data.tabId;
         const responseHeaders = data.responseHeaders;
         if (tabId > 0) {
-          const tabSessionId = this.state.getTabSessionId(tabId);
+          const tabSessionId = this.state.getSessionIdByTabId(tabId);
           if (tabSessionId !== 0 && tabSessionId !== undefined) {
             for (const headerKey in responseHeaders) {
               if (responseHeaders[headerKey].name.toLowerCase() == "set-cookie") {

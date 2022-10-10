@@ -1,10 +1,9 @@
 import Tab = chrome.tabs.Tab;
 import { ExtensionStateService } from "./extension-state.service";
-import * as constants from "./constants";
 
 export class TabControllerService {
   constructor(private chromeNamespace: typeof chrome, private browserNamespace: typeof browser, private state: ExtensionStateService) {}
-
+  /*
   private newChromeSessionTab(url: string) {
     this.chromeNamespace.tabs.create({
       url: chrome.runtime.getURL(url),
@@ -129,7 +128,7 @@ export class TabControllerService {
     if (userAgent.indexOf("Chrome") > 0) chromiumNewSessionTab(consoleRegion, url);
     else firefoxNewSessionTab(consoleRegion, url, sessionKey);
   }
-
+*/
   listen(): void {
     this.chromeNamespace.tabs.onCreated.addListener((tab: Tab) => this.handleCreated(tab));
     this.chromeNamespace.tabs.onRemoved.addListener((tabId: number) => this.handleRemoved(tabId));
@@ -137,17 +136,17 @@ export class TabControllerService {
 
   private handleCreated(tab: Tab): void {
     if (tab.openerTabId) {
-      const currentSessionId = this.state.getTabSessionId(tab.openerTabId);
-      this.state.addTab(tab.id, currentSessionId);
+      const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
+      this.state.addTabToSession(tab.id, currentSessionId);
     } else {
-      this.state.addTab(tab.id, this.state.nextSessionId);
+      this.state.addTabToSession(tab.id, this.state.nextSessionId);
     }
     this.state.nextSessionId = 0;
     console.log(`Tab ${tab.id} was created from ${tab.openerTabId ?? "popup page"}`);
   }
 
   private handleRemoved(tabId: number): void {
-    this.state.removeTab(tabId);
-    console.log(`Tab ${tabId} was removed! RIP†`);
+    this.state.removeTabFromSession(tabId);
+    console.log(`Tab ${tabId} was removed! R†P`);
   }
 }
