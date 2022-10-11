@@ -1,27 +1,29 @@
+import { LeappSessionInfo } from "./leapp-session-info";
+
 export class ExtensionStateService {
-  //public sessionDictionary: SessionDictionary;
-  public hashedSessions: number[];
   private readonly userAgent: string;
+  private readonly hashedSessions: number[];
+  private readonly leappActiveSessions: LeappSessionInfo[];
   private _sessionCounter: number;
   private _nextSessionId: number;
 
   constructor(navigator: Navigator) {
-    //this.sessionDictionary = {};
+    this.leappActiveSessions = [];
     this.hashedSessions = [];
     this._sessionCounter = 1;
     this._nextSessionId = 0;
     this.userAgent = navigator.userAgent;
   }
 
-  get isChrome() {
+  get isChrome(): boolean {
     return this.userAgent.indexOf("Chrome") > 0;
   }
 
-  get isFirefox() {
+  get isFirefox(): boolean {
     return this.userAgent.indexOf("Mozilla") > 0;
   }
 
-  get sessionCounter() {
+  get sessionCounter(): number {
     return this._sessionCounter;
   }
 
@@ -29,7 +31,7 @@ export class ExtensionStateService {
     this._sessionCounter = sessionCounter;
   }
 
-  get nextSessionId() {
+  get nextSessionId(): number {
     return this._nextSessionId;
   }
 
@@ -37,44 +39,23 @@ export class ExtensionStateService {
     this._nextSessionId = nextSessionId;
   }
 
-  // Return the numeric id only
   getSessionIdByTabId(tabId: number): number {
     return this.hashedSessions[tabId];
   }
 
-  // addNewSession() {
-  //   const sessionKey = `session-${this.sessionCounter}`;
-  //   this.sessionDictionary[sessionKey] = [];
-  // }
-
-  addTabToSession(tabId: number, sessionId: number) {
-    console.log("-ADD TAB TO SESSION-");
-    console.log("tabId: ", tabId);
-    console.log("sessionId: ", sessionId);
+  setSessionIdByTabId(tabId: number, sessionId: number): void {
     this.hashedSessions[tabId] = sessionId;
-    //this.sessionDictionary[`session-${sessionId}`].push(tabId);
   }
 
-  removeTabFromSession(tabIdToRemove: number) {
-    //const tabSessionName = this.getTabSessionName(tabIdToRemove);
-    //this.sessionDictionary[tabSessionName] = this.sessionDictionary[tabSessionName].filter((tabId) => tabId !== tabIdToRemove);
+  setLeappActiveSession(sessionId: number, leappSessionInfo: LeappSessionInfo): void {
+    this.leappActiveSessions[sessionId] = leappSessionInfo;
+  }
+
+  addTabToSession(tabId: number, sessionId: number): void {
+    this.hashedSessions[tabId] = sessionId;
+  }
+
+  removeTabFromSession(tabIdToRemove: number): void {
     delete this.hashedSessions[tabIdToRemove];
   }
-
-  // printSessionDictionary(): void {
-  //   console.log(this.sessionDictionary);
-  // }
-
-  printHashedSessions(): void {
-    console.log(this.hashedSessions);
-  }
-
-  // Return the session name for the tab id
-  // private getTabSessionName(requestedTabId: number): string | undefined {
-  //   return Object.keys(this.sessionDictionary).find((key) => {
-  //     for (const tabId of this.sessionDictionary[key]) {
-  //       if (this.sessionDictionary[key][tabId] === requestedTabId) return key;
-  //     }
-  //   });
-  // }
 }

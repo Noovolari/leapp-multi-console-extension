@@ -10,16 +10,10 @@ export class BootstrapService {
 
   listen(): void {
     this.windowNamespace.onload = () => {
-      // Add the first, default session
-      //const sessionKey = `session-0`;
-      //this.state.sessionDictionary[sessionKey] = [];
-      //this.state.addNewSession();
-
+      this.state.setLeappActiveSession(this.defaultSessionId, null);
       this.chromeNamespace.tabs.query({ windowId: this.chromeNamespace.windows.WINDOW_ID_CURRENT }, (tabs) => {
         for (const tab of tabs) {
-          this.state.hashedSessions[tab.id] = this.defaultSessionId;
-          //this.state.sessionDictionary[`session-1`].push(tab.id);
-          //this.state.addTabToSession(tab.id, this.defaultSessionId);
+          this.state.setSessionIdByTabId(tab.id, this.defaultSessionId);
         }
         this.chromeNamespace.cookies.getAll({}, (cookies: Cookie[]) => {
           for (const cookie of cookies) {

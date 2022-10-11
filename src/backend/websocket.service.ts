@@ -1,4 +1,5 @@
 import { TabControllerService } from "./tab-controller.service";
+import { LeappSessionInfo } from "./leapp-session-info";
 
 export class WebsocketService {
   private connected;
@@ -21,9 +22,9 @@ export class WebsocketService {
         };
 
         this.ws.onmessage = (event) => {
-          const url = JSON.parse(event.data).url;
-          console.log("received: %s", url);
-          this.tabControllerService.openNewSessionTab(url);
+          const payload: LeappSessionInfo = JSON.parse(event.data);
+          console.log("received: %s", payload);
+          this.tabControllerService.openNewSessionTab(payload);
           this.ws.send("payload from Leapp received correctly");
         };
 
