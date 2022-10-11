@@ -7,19 +7,36 @@ import { ContentService } from "./content.service";
 
 const extensionStateService = new ExtensionStateService(navigator);
 
-const tabControllerService = new TabControllerService(chrome, browser, extensionStateService);
+let webRequestService;
+if (extensionStateService.isChrome) {
+  webRequestService = new WebRequestService(chrome.webRequest, extensionStateService);
+  webRequestService.listen();
+}
+
+let firefoxBrowser;
+if (extensionStateService.isFirefox) {
+  firefoxBrowser = browser;
+}
+const tabControllerService = new TabControllerService(chrome, extensionStateService, firefoxBrowser);
 tabControllerService.listen();
 
 const bootstrapService = new BootstrapService(window, chrome, extensionStateService);
 bootstrapService.listen();
 
-if (extensionStateService.isChrome) {
-  const webRequestService = new WebRequestService(chrome.webRequest, extensionStateService);
-  webRequestService.listen();
-}
-
 const contentService = new ContentService(chrome.runtime, extensionStateService);
 contentService.listen();
 
-const webSocketService = new WebsocketService();
+const webSocketService = new WebsocketService(tabControllerService);
 webSocketService.listen();
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const printSessionDictionary = (): void => {
+  extensionStateService.printSessionDictionary();
+};
+
+(window as any).extensionStateService = extensionStateService;
+(window as any).tabControllerService = tabControllerService;
+(window as any).bootstrapService = bootstrapService;
+(window as any).webRequestService = webRequestService;
+(window as any).contentService = contentService;
+(window as any).webSocketService = webSocketService;

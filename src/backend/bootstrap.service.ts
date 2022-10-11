@@ -4,6 +4,8 @@ import Details = chrome.cookies.Details;
 import * as constants from "./constants";
 
 export class BootstrapService {
+  private readonly defaultSessionId = 0;
+
   constructor(private windowNamespace: typeof window, private chromeNamespace: typeof chrome, private state: ExtensionStateService) {}
 
   listen(): void {
@@ -13,7 +15,7 @@ export class BootstrapService {
 
       this.chromeNamespace.tabs.query({ windowId: this.chromeNamespace.windows.WINDOW_ID_CURRENT }, (tabs) => {
         for (const tab of tabs) {
-          this.state.addTabToSession(tab.id, 0);
+          this.state.addTabToSession(tab.id, this.defaultSessionId);
         }
         this.chromeNamespace.cookies.getAll({}, (cookies: Cookie[]) => {
           for (const cookie of cookies) {

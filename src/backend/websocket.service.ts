@@ -1,8 +1,10 @@
+import { TabControllerService } from "./tab-controller.service";
+
 export class WebsocketService {
   private connected;
   private ws;
 
-  constructor(public port: number = 8095, public interval: number = 10000) {
+  constructor(private tabControllerService: TabControllerService, public port: number = 8095, public interval: number = 10000) {
     this.connected = false;
     this.ws = null;
   }
@@ -19,8 +21,9 @@ export class WebsocketService {
         };
 
         this.ws.onmessage = (event) => {
-          console.log("recevied: %s", event.data);
-          // TODO Tell the Extension to open the received url in a new session tab
+          const url = JSON.parse(event.data).url;
+          console.log("received: %s", url);
+          this.tabControllerService.openNewSessionTab(url);
           this.ws.send("payload from Leapp received correctly");
         };
 

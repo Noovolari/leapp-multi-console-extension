@@ -29,7 +29,9 @@
     "webRequest",
     "webRequestBlocking",
     "webNavigation",
-    "<all_urls>"
+    "<all_urls>",
+    "background",
+    "history"
   ],
   "content_scripts": [
     {

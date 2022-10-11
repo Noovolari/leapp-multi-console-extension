@@ -4,19 +4,39 @@ export class ExtensionStateService {
   private readonly sessionDictionary: SessionDictionary;
   private readonly hashedSessions: number[];
   private readonly userAgent: string;
-  public sessionCounter: number;
-  public nextSessionId: number;
+  private _sessionCounter: number;
+  private _nextSessionId: number;
 
   constructor(navigator: Navigator) {
     this.sessionDictionary = {};
     this.hashedSessions = [];
-    this.sessionCounter = 1;
-    this.nextSessionId = 0;
+    this._sessionCounter = 0;
+    this._nextSessionId = 0;
     this.userAgent = navigator.userAgent;
   }
 
   get isChrome() {
     return this.userAgent.indexOf("Chrome") > 0;
+  }
+
+  get isFirefox() {
+    return this.userAgent.indexOf("Mozilla") > 0;
+  }
+
+  get sessionCounter() {
+    return this._sessionCounter;
+  }
+
+  set sessionCounter(sessionCounter: number) {
+    this._sessionCounter = sessionCounter;
+  }
+
+  get nextSessionId() {
+    return this._nextSessionId;
+  }
+
+  set nextSessionId(nextSessionId: number) {
+    this._nextSessionId = nextSessionId;
   }
 
   // Return the numeric id only
@@ -38,6 +58,10 @@ export class ExtensionStateService {
     const tabSessionName = this.getTabSessionName(tabIdToRemove);
     this.sessionDictionary[tabSessionName] = this.sessionDictionary[tabSessionName].filter((tabId) => tabId !== tabIdToRemove);
     delete this.hashedSessions[tabIdToRemove];
+  }
+
+  printSessionDictionary(): void {
+    console.log(this.sessionDictionary);
   }
 
   // Return the session name for the tab id
