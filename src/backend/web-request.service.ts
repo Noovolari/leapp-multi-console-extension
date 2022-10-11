@@ -1,28 +1,29 @@
 import { ExtensionStateService } from "./extension-state.service";
+import * as constants from "./constants";
 import WebRequestHeadersDetails = chrome.webRequest.WebRequestHeadersDetails;
 import WebResponseHeadersDetails = chrome.webRequest.WebResponseHeadersDetails;
-import * as constants from "./constants";
 
 export class WebRequestService {
   constructor(private chromeWebRequest: typeof chrome.webRequest, private state: ExtensionStateService) {}
 
   listen(): void {
-    this.chromeWebRequest.onBeforeSendHeaders.addListener(
+    chrome.webRequest.onBeforeSendHeaders.addListener(
       (data: WebRequestHeadersDetails) => {
         const tabId = data.tabId;
         if (tabId > 0) {
           const tabSessionId = this.state.getSessionIdByTabId(tabId);
           const requestHeaders = data.requestHeaders;
-          if (tabSessionId !== 0 && tabSessionId !== undefined) {
+          if (tabId !== 0 && tabSessionId !== undefined) {
             for (const headerKey in requestHeaders) {
               if (requestHeaders[headerKey].name.toLowerCase() === "cookie") {
                 const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
                 const newCookiesString = [];
                 for (const index in cleanCookiesString) {
-                  const sessionString = `${constants.separatorToken}${tabSessionId}${constants.separatorToken}`;
+                  const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
                   if (cleanCookiesString[index].startsWith(sessionString)) {
                     const slicingPoint =
-                      cleanCookiesString[index].indexOf(constants.separatorToken, constants.leappToken.length) + constants.separatorToken.length;
+                      cleanCookiesString[index].indexOf(`${constants.separatorToken}`, `${constants.leappToken}`.length) +
+                      `${constants.separatorToken}`.length;
                     newCookiesString.push(cleanCookiesString[index].slice(slicingPoint));
                   }
                 }
@@ -35,7 +36,7 @@ export class WebRequestService {
                 const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
                 const newCookiesString = [];
                 for (const index in cleanCookiesString) {
-                  if (!cleanCookiesString[index].startsWith(constants.leappToken)) {
+                  if (!cleanCookiesString[index].startsWith(`${constants.leappToken}`)) {
                     newCookiesString.push(cleanCookiesString[index]);
                   }
                 }
@@ -43,7 +44,9 @@ export class WebRequestService {
               }
             }
           }
-          return { requestHeaders };
+          return {
+            requestHeaders,
+          };
         }
       },
       {
@@ -52,7 +55,7 @@ export class WebRequestService {
       ["blocking", "requestHeaders", "extraHeaders"]
     );
 
-    this.chromeWebRequest.onHeadersReceived.addListener(
+    chrome.webRequest.onHeadersReceived.addListener(
       (data: WebResponseHeadersDetails) => {
         const tabId = data.tabId;
         const responseHeaders = data.responseHeaders;
@@ -65,7 +68,9 @@ export class WebRequestService {
                 responseHeaders[headerKey].value = sessionString + responseHeaders[headerKey].value;
               }
             }
-            return { responseHeaders };
+            return {
+              responseHeaders,
+            };
           }
         }
       },

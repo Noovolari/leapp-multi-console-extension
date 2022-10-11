@@ -13,10 +13,6 @@
     "scripts": [ "background.js" ],
     "persistent": true
   },
-  "browser_action": {
-    "default_title": "Leapp Browser Extension",
-    "default_popup": "popup.html"
-  },
   "permissions": [
     "contextualIdentities",
     "contextMenus",
@@ -24,21 +20,20 @@
     "tabs",
     "cookies",
     "storage",
+    "http://*/*",
     "https://*/*",
     "activeTab",
     "webRequest",
     "webRequestBlocking",
     "webNavigation",
-    "<all_urls>",
-    "background",
-    "history"
+    "<all_urls>"
   ],
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": [ "<all_urls>" ],
+      "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_start",
-      "js": [ "contentScript.js" ]
+      "js": [ "content_script.js" ]
     }
   ]
 }

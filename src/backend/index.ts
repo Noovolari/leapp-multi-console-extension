@@ -29,11 +29,6 @@ contentService.listen();
 const webSocketService = new WebsocketService(tabControllerService);
 webSocketService.listen();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const printSessionDictionary = (): void => {
-  extensionStateService.printSessionDictionary();
-};
-
 (window as any).extensionStateService = extensionStateService;
 (window as any).tabControllerService = tabControllerService;
 (window as any).bootstrapService = bootstrapService;

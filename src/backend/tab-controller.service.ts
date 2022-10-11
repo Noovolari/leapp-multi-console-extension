@@ -5,10 +5,9 @@ export class TabControllerService {
   constructor(private chromeNamespace: typeof chrome, private state: ExtensionStateService, private browserNamespace?: typeof browser) {}
 
   openNewSessionTab(url: string): void {
-    this.state.sessionCounter = this.state.sessionCounter + 1;
-    const sessionNum = this.state.sessionCounter;
+    const sessionNum = this.state.sessionCounter++;
     const sessionKey = `session-${sessionNum}`;
-    this.state.addNewSession();
+    //this.state.addNewSession();
     this.state.nextSessionId = sessionNum;
     if (this.state.isChrome) {
       this.newChromeSessionTab(url);
