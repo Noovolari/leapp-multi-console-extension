@@ -6,42 +6,63 @@ import { leappToken } from "./models/constants";
 
 let sessionToken;
 let port;
-//let separatorToken;
-//let sessionNumber;
 
-if (navigator.userAgent.indexOf("Chrome") > 0) {
-  const injectedScript =
+// Magic Strings
+const isChrome = () => navigator.userAgent.indexOf("Chrome") > 0;
+const newCookieSeparator = "; ";
+const sessionsCookiesLocalStorageSelector = "##SESSION-COOKIES##";
+const setCustomCookieEventString = "SET_COOKIE";
+const getCustomCookieEventString = "GET_COOKIE";
+const extractSessionNumberRequest = "extract-session-number";
+const backgroundScriptConnectionName = "background-script-connection";
+const getSessionNumberRequest = "get-ses-num";
+
+// ======= Extracted functions ==
+// ==============================
+const customCookieSetFunction = (cookieToSet): void => {
+  const event = new CustomEvent(setCustomCookieEventString, {
+    detail: cookieToSet,
+  });
+  document.dispatchEvent(event);
+};
+
+const customCookieGetFunction = (): string => {
+  const event = new CustomEvent(getCustomCookieEventString);
+  document.dispatchEvent(event);
+  let cookies;
+  try {
+    cookies = localStorage.getItem(sessionsCookiesLocalStorageSelector);
+    localStorage.removeItem(sessionsCookiesLocalStorageSelector);
+  } catch (e) {
+    cookies = document.getElementById(sessionsCookiesLocalStorageSelector).innerText;
+  }
+  return cookies;
+};
+
+// Overrides document.cookie behaviour: when a cookie is SET customCookieSetFunction is called,
+// likewise if all cookies are obtained, customCookieGetFunction is called.
+const generateCookieSetterGetterOverwriteScript = (): string => {
+  return (
     "(" +
     function () {
       Object.defineProperty(document, "cookie", {
-        set: function (cookieToSet) {
-          const event = new CustomEvent("SET_COOKIE", {
-            detail: cookieToSet,
-          });
-          document.dispatchEvent(event);
-        },
-        get: function () {
-          const event = new CustomEvent("GET_COOKIE");
-          document.dispatchEvent(event);
-          let cookies;
-          try {
-            cookies = localStorage.getItem("##SESSION-COOKIES##");
-            localStorage.removeItem("##SESSION-COOKIES##");
-          } catch (e) {
-            cookies = document.getElementById("##SESSION-COOKIES##").innerText;
-          }
-          return cookies;
-        },
+        set: customCookieSetFunction,
+        get: customCookieGetFunction,
       });
     } +
-    ")();";
+    ")();"
+  );
+};
+
+if (isChrome()) {
+  const injectedScript = generateCookieSetterGetterOverwriteScript();
 
   const script = document.createElement("script");
   script.appendChild(document.createTextNode(injectedScript));
   (document.head || document.documentElement).appendChild(script);
   script.parentNode.removeChild(script);
 
-  document.addEventListener("SET_COOKIE", (event: any) => {
+  document.addEventListener(setCustomCookieEventString, (event: any) => {
     const cookie = event.detail;
     if (sessionToken === null || sessionToken === "") {
       document.cookie = cookie;
@@ -50,7 +71,7 @@ if (navigator.userAgent.indexOf("Chrome") > 0) {
     }
   });
 
-  document.addEventListener("GET_COOKIE", () => {
+  document.addEventListener(getCustomCookieEventString, () => {
     let newCookies = "";
     const cookiesString = document.cookie;
     const cookiesArray: string[] = [];
@@ -60,19 +81,19 @@ if (navigator.userAgent.indexOf("Chrome") > 0) {
 
       for (const index in cookiesArray) {
         if (sessionToken) {
-          // not default session
+          // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
           if (cookiesArray[index].substring(0, sessionToken.length) !== sessionToken) {
             continue;
           }
         } else {
-          // default session
+          // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
           if (cookiesArray[index].startsWith(leappToken)) {
             continue;
           }
         }
 
         if (newCookies) {
-          newCookies += "; ";
+          newCookies += newCookieSeparator;
         }
 
         newCookies += sessionToken ? cookiesArray[index].substring(sessionToken.length) : cookiesArray[index];
@@ -80,44 +101,34 @@ if (navigator.userAgent.indexOf("Chrome") > 0) {
     }
 
     try {
-      localStorage.setItem("##SESSION-COOKIES##", newCookies);
+      localStorage.setItem(sessionsCookiesLocalStorageSelector, newCookies);
     } catch (err) {
-      if (!document.getElementById("##SESSION-COOKIES##")) {
+      if (!document.getElementById(sessionsCookiesLocalStorageSelector)) {
         const index = document.createElement("div");
-        index.setAttribute("id", "##SESSION-COOKIES##");
+        index.setAttribute("id", sessionsCookiesLocalStorageSelector);
         document.documentElement.appendChild(index);
         index.style.display = "none";
       }
-      (document.getElementById("##SESSION-COOKIES##") as any).a = newCookies;
+      (document.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
     }
   });
 }
 
 try {
-  port = chrome.runtime.connect({ name: "background-script-connection" });
+  port = chrome.runtime.connect({ name: backgroundScriptConnectionName });
 
-  port.onMessage.addListener(function (message) {
-    if (message.request == "extract-session-number") {
-      if (message.content == "undefined") {
-        window.location.reload();
-      }
-      if (message.content != null) {
+  port.onMessage.addListener((message) => {
+    if (message.request === extractSessionNumberRequest) {
+      if (message.content) {
         sessionToken = message.content;
-        //separatorToken = message.separator;
-        //sessionNumber = sessionToken.split(message.separator)[2];
+      } else {
+        window.location.reload();
       }
     }
   });
 
-  port.postMessage({
-    request: "get-ses-num",
-  });
-
-  port.onDisconnect.addListener(function () {});
-} catch (e) {
-  console.error(e);
-}
-
-if (!port) {
-  throw "port error";
+  port.postMessage({ request: getSessionNumberRequest });
+  port.onDisconnect.addListener(() => console.log("port disconnected"));
+} catch (err) {
+  console.error(err);
 }

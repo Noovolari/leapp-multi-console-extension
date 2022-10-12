@@ -62,7 +62,6 @@ module.exports = (env, argv) => ({
         { from: "./manifest.json" },
         { from: "**/*", context: "asset" },
         { from: "**/*", context: "src/frontend"},
-        //{ from: "src/backend/content_script.js"},
       ],
     }),
     // Extract CSS into separate files
