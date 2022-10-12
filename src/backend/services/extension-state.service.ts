@@ -1,14 +1,15 @@
-import { LeappSessionInfo } from "./leapp-session-info";
+import { LeappSessionInfo } from "../models/leapp-session-info";
+import { IsolatedSession } from "../models/isolated-session";
 
 export class ExtensionStateService {
   private readonly userAgent: string;
   private readonly hashedSessions: number[];
-  private readonly leappActiveSessions: LeappSessionInfo[];
+  private readonly isolatedSessions: IsolatedSession[];
   private _sessionCounter: number;
   private _nextSessionId: number;
 
   constructor(navigator: Navigator) {
-    this.leappActiveSessions = [];
+    this.isolatedSessions = [];
     this.hashedSessions = [];
     this._sessionCounter = 1;
     this._nextSessionId = 0;
@@ -43,19 +44,20 @@ export class ExtensionStateService {
     return this.hashedSessions[tabId];
   }
 
-  setSessionIdByTabId(tabId: number, sessionId: number): void {
-    this.hashedSessions[tabId] = sessionId;
-  }
-
-  setLeappActiveSession(sessionId: number, leappSessionInfo: LeappSessionInfo): void {
-    this.leappActiveSessions[sessionId] = leappSessionInfo;
+  createNewIsolatedSession(sessionId: number, leappSession: LeappSessionInfo): void {
+    const newIsolatedSession: IsolatedSession = { sessionId, leappSession, tabsList: [] };
+    this.isolatedSessions.push(newIsolatedSession);
   }
 
   addTabToSession(tabId: number, sessionId: number): void {
+    this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId).tabsList.push(tabId);
     this.hashedSessions[tabId] = sessionId;
   }
 
   removeTabFromSession(tabIdToRemove: number): void {
+    const sessionId = this.hashedSessions[tabIdToRemove];
+    const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
+    isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
     delete this.hashedSessions[tabIdToRemove];
   }
 }

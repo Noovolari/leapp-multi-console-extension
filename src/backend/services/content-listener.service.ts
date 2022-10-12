@@ -1,8 +1,8 @@
 import { ExtensionStateService } from "./extension-state.service";
 import Port = chrome.runtime.Port;
-import * as constants from "./constants";
+import * as constants from "../models/constants";
 
-export class ContentService {
+export class ContentListenerService {
   constructor(private chromeRuntime: typeof chrome.runtime, private state: ExtensionStateService) {}
 
   listen() {
@@ -12,7 +12,7 @@ export class ContentService {
           if (port.sender.tab) {
             let sessionToken = "";
             const sessionId = this.state.getSessionIdByTabId(port.sender.tab.id);
-            if (sessionId !== 0 && sessionId) {
+            if (sessionId !== constants.defaultSessionId && sessionId) {
               sessionToken = `${constants.leappToken}${sessionId}${constants.separatorToken}`;
             }
             port.postMessage({

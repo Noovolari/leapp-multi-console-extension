@@ -1,5 +1,5 @@
 import { ExtensionStateService } from "./extension-state.service";
-import * as constants from "./constants";
+import * as constants from "../models/constants";
 import WebRequestHeadersDetails = chrome.webRequest.WebRequestHeadersDetails;
 import WebResponseHeadersDetails = chrome.webRequest.WebResponseHeadersDetails;
 
