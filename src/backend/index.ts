@@ -3,7 +3,7 @@ import { TabControllerService } from "./tab-controller.service";
 import { ExtensionStateService } from "./extension-state.service";
 import { BootstrapService } from "./bootstrap.service";
 import { WebRequestService } from "./web-request.service";
-import { ContentService } from "./content.service";
+import { ContentListenerService } from "./content-listener.service";
 
 const extensionStateService = new ExtensionStateService(navigator);
 
@@ -23,7 +23,7 @@ tabControllerService.listen();
 const bootstrapService = new BootstrapService(window, chrome, extensionStateService);
 bootstrapService.listen();
 
-const contentService = new ContentService(chrome.runtime, extensionStateService);
+const contentService = new ContentListenerService(chrome.runtime, extensionStateService);
 contentService.listen();
 
 const webSocketService = new WebsocketService(tabControllerService);

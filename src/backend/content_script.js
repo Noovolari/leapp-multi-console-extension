@@ -1,4 +1,4 @@
-let separatorToken;
+/*let separatorToken;
 let sessionToken = null;
 let sessionNumber;
 let port;
@@ -110,9 +110,11 @@ try {
       extractSessionNumber(message.content, message.separator);
     }
   });
+
   port.postMessage({
     request: "get-ses-num"
   });
+
   port.onDisconnect.addListener(function () { });
 } catch (e) {
   console.error(e);
@@ -121,3 +123,4 @@ try {
 if (!port) {
   throw "port error";
 }
+*/

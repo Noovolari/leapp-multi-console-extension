@@ -33,7 +33,7 @@
       "all_frames": true,
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_start",
-      "js": [ "content_script.js" ]
+      "js": [ "contentScript.js" ]
     }
   ]
 }

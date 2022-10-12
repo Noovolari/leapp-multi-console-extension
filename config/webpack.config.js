@@ -8,7 +8,7 @@ const PATHS = require("./paths");
 module.exports = (env, argv) => ({
   entry: {
     popup: PATHS.src + "/frontend/popup.js",
-    // contentScript: PATHS.src + "/backend/contentScript.ts",
+    contentScript: PATHS.src + "/backend/contentScript.ts",
     background: PATHS.src + "/backend/index.ts",
   },
   output: {
@@ -62,7 +62,7 @@ module.exports = (env, argv) => ({
         { from: "./manifest.json" },
         { from: "**/*", context: "asset" },
         { from: "**/*", context: "src/frontend"},
-        { from: "src/backend/content_script.js"},
+        //{ from: "src/backend/content_script.js"},
       ],
     }),
     // Extract CSS into separate files
