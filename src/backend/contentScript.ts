@@ -2,7 +2,7 @@
 // navigator / userAgent
 // window / cookie
 
-import { leappToken } from "./constants";
+import { leappToken } from "./models/constants";
 
 let sessionToken;
 let port;

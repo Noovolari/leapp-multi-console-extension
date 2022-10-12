@@ -1,5 +1,5 @@
 import { TabControllerService } from "./tab-controller.service";
-import { LeappSessionInfo } from "./leapp-session-info";
+import { LeappSessionInfo } from "../models/leapp-session-info";
 
 export class WebsocketService {
   private connected;

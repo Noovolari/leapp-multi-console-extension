@@ -1,6 +1,6 @@
 import Tab = chrome.tabs.Tab;
 import { ExtensionStateService } from "./extension-state.service";
-import { LeappSessionInfo } from "./leapp-session-info";
+import { LeappSessionInfo } from "../models/leapp-session-info";
 
 export class TabControllerService {
   constructor(private chromeNamespace: typeof chrome, private state: ExtensionStateService, private browserNamespace?: typeof browser) {}
@@ -8,7 +8,7 @@ export class TabControllerService {
   openNewSessionTab(leappPayload: LeappSessionInfo): void {
     const sessionId = this.state.sessionCounter;
     const sessionKey = `session-${sessionId}`;
-    this.state.setLeappActiveSession(sessionId, leappPayload);
+    this.state.createNewIsolatedSession(sessionId, leappPayload);
     this.state.nextSessionId = this.state.sessionCounter++;
     if (this.state.isChrome) {
       this.newChromeSessionTab(leappPayload.url);
