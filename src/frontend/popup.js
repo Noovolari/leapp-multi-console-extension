@@ -97,16 +97,17 @@ require('./popup.css');
 
   document.addEventListener('DOMContentLoaded', restoreCounter);
 
-  // Communicate with background file by sending a message
+  chrome.runtime.connect({ name: "background-connection" });
+
   chrome.runtime.sendMessage(
-    {
-      type: 'GREETINGS',
-      payload: {
-        message: 'Hello, my name is Pop. I am from Popup.',
-      },
-    },
+    { type: "get-leapp-sessions" },
     (response) => {
-      console.log(response.message);
+      const element = document.getElementById("test");
+      const parsedResponse = JSON.parse(response);
+      const list = parsedResponse.map((session) => session.data ? session.data.sessionName : "");
+      element.innerText = list.join(",");
+      // take the div by id and substitute its content with: placeholder with nothing if only default "0" session is on, otherwise a table td list with all sessions
+      // create an element for each active session
     }
   );
 })();

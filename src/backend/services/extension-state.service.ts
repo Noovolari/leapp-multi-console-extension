@@ -4,7 +4,7 @@ import { IsolatedSession } from "../models/isolated-session";
 export class ExtensionStateService {
   private readonly userAgent: string;
   private readonly hashedSessions: number[];
-  private readonly isolatedSessions: IsolatedSession[];
+  public isolatedSessions: IsolatedSession[];
   private _sessionCounter: number;
   private _nextSessionId: number;
 

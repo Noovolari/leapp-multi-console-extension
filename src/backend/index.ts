@@ -4,6 +4,7 @@ import { ExtensionStateService } from "./services/extension-state.service";
 import { BootstrapService } from "./services/bootstrap.service";
 import { WebRequestService } from "./services/web-request.service";
 import { ContentListenerService } from "./services/content-listener.service";
+import { PopupCommunicationService } from "./services/popup-communication.service";
 
 const extensionStateService = new ExtensionStateService(navigator);
 
@@ -13,11 +14,15 @@ if (extensionStateService.isChrome) {
   webRequestService.listen();
 }
 
+const popupCommunicationService = new PopupCommunicationService(chrome.runtime, extensionStateService);
+popupCommunicationService.listen();
+
 let firefoxBrowser;
 if (extensionStateService.isFirefox) {
   firefoxBrowser = browser;
 }
-const tabControllerService = new TabControllerService(chrome, extensionStateService, firefoxBrowser);
+
+const tabControllerService = new TabControllerService(chrome, extensionStateService, popupCommunicationService, firefoxBrowser);
 tabControllerService.listen();
 
 const bootstrapService = new BootstrapService(window, chrome, extensionStateService);
