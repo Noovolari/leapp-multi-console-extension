@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans%7CRoboto:400,500,700&display=swap");
+@import url("https://fonts.googleapis.com/icon?family=Material+Icons%7CMaterial+Icons+Outlined");
+
 /* normalize css starts here */
 *,
 *::before,
@@ -9,89 +12,87 @@
 /* normalize css ends here */
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial,
-    sans-serif;
-  color: antiquewhite;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  width: 250px;
-  height: 400px;
+  width: 350px;
+  height: 500px;
 }
 
-.separator {
-  color: #404040;
+.header {
+  text-align: center;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  display: block;
+  height: 50px;
+  background-color: #363336;
+}
+
+.row {
+  height: 50px;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: solid 1px #363336;
+  align-items: center;
+}
+
+.row:hover {
+  cursor: pointer;
+}
+
+.session-name, .session-role {
+  color: #dedcdd;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.session-info-container {
+  position: relative;
+  width: 230px;
+  left: 5px;
+  padding-right: 9px;
+}
+
+#container img {
+  height: 16px;
+  position: relative;
+  bottom: -1px;
+}
+
+#container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  background-color: #1F1D1E;
 }
 
 .app {
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  padding: 20px;
-  background-color: #1F1D1E;
 }
 
-.title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
-}
-
-.subtitle {
-  font-size: 12px;
-}
-
-code {
-  font-size: 12px;
-  font-family: inherit;
-  background-color: rgba(254, 237, 185, 0.3);
-  padding: 2px 4px;
-  border-radius: 2px;
-}
-
-.counter-label {
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-.counter {
-  font-size: 36px;
-  font-weight: 700;
-}
-
-.button-container {
-  margin-top: 15px;
-}
-
-.button {
-  border: 0;
+span.badge {
   display: inline-block;
-  padding: 10px 20px;
-  margin-right: 4px;
-  margin-left: 4px;
-  background-color: bisque;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-  user-select: none;
+  padding: 5px;
+  max-width: 85px;
+  min-width: 30px;
+  height: 20px;
+  font-size: 10px;
+  text-transform: uppercase;
 }
 
-.button:focus {
-  outline: none;
-}
-
-.button:hover {
-  transform: scale(1.1);
-}
-
-.divider {
-  margin: 30px auto 25px;
-  width: 50px;
-  border: 0.5px dashed #000;
-  opacity: 0.1;
+span.badge-region {
+  border-radius: 3px;
+  padding-top: 4.5px;
+  padding-right: 7px;
+  padding-left: 7px;
+  font-weight: 500;
+  background-color: #999999 !important;
+  color: #ffffff !important;
 }

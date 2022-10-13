@@ -7,30 +7,23 @@
   </head>
   <body>
     <div class="app">
-      <header>
-        <img src="icons/icon_48.png" alt="">
+      <header class="header">
+        <img src="icons/icon_32.png" alt="">
       </header>
-      <p class="counter-label">Counter</p>
-      <div id="counter" class="counter"></div>
-      <div class="button-container">
-        <button id="decrementBtn" class="button">-</button>
-        <button id="incrementBtn" class="button">+</button>
+      <div id="container">
+        <!--<p class="first-launch">Start by opening sessions from Leapp</p>-->
+        <div class="row">
+          <img src="icons/aws-dark.png">
+          <div class="session-info-container">
+            <p class="session-name">Name: Sessione di Test</p>
+            <p class="session-role">Role: Ruolo di Test</p>
+          </div>
+          <span class="badge badge-gray badge-region">EU-WEST-1</span>
+        </div>
       </div>
-
-      <hr class="divider" />
-
-      <p class="title">Chrome Extension is Ready!</p>
-      <p class="subtitle">Start by updating <code>popup.html</code></p>
       <p id="test">...</p>
     </div>
 
     <script src="popup.js"></script>
-
-    <!--
-      This HTML file opens when you click on icon from the toolbar.
-
-      To begin the development, run `npm run watch`.
-      To create a production bundle, use `npm run build`.
-    -->
   </body>
 </html>
