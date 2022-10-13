@@ -47,7 +47,7 @@
     "eslint-plugin-prefer-arrow": "latest",
     "eslint-plugin-prettier": "^4.2.1",
     "file-loader": "^6.2.0",
-    "husky": "^8.0.1",
+    "husky": "^8.0.0",
     "jest": "^28.0.8",
     "lint-staged": "12.3.5",
     "mini-css-extract-plugin": "^2.6.1",

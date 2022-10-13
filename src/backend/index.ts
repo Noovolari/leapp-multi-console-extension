@@ -21,8 +21,7 @@ let firefoxBrowser;
 if (extensionStateService.isFirefox) {
   firefoxBrowser = browser;
 }
-
-const tabControllerService = new TabControllerService(chrome, extensionStateService, popupCommunicationService, firefoxBrowser);
+const tabControllerService = new TabControllerService(chrome, extensionStateService, firefoxBrowser);
 tabControllerService.listen();
 
 const bootstrapService = new BootstrapService(window, chrome, extensionStateService);
