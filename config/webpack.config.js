@@ -8,8 +8,8 @@ const PATHS = require("./paths");
 module.exports = (env, argv) => ({
   entry: {
     popup: PATHS.src + "/frontend/popup.js",
-    //contentScript: PATHS.src + "/backend/contentScript.ts",
-    background: PATHS.src + "/backend/index.ts",
+    "content-script": PATHS.src + "/backend/content-script.ts",
+    "background-script": PATHS.src + "/backend/background-script.ts",
   },
   output: {
     // the build folder to output bundles and assets in.
@@ -62,7 +62,6 @@ module.exports = (env, argv) => ({
         { from: "./manifest.json" },
         { from: "**/*", context: "asset" },
         { from: "**/*", context: "src/frontend"},
-        { from: "src/backend/content_script.js" },
       ],
     }),
     // Extract CSS into separate files

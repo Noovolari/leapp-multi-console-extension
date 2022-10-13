@@ -1,15 +1,12 @@
-import { LeappSessionInfo } from "../models/leapp-session-info";
 import { ExtensionStateService } from "./extension-state.service";
-import Port = chrome.runtime.Port;
+import { sessionListRequest } from "../models/constants";
 
 export class PopupCommunicationService {
-  private readonly port: Port;
-
   constructor(private chromeRuntime: typeof chrome.runtime, private state: ExtensionStateService) {}
 
   listen() {
     chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-      if (request.type === "get-leapp-sessions") {
+      if (request.type === sessionListRequest) {
         const activeSessions = this.state.isolatedSessions.map((session) => {
           return {
             data: session.leappSession,
@@ -20,9 +17,5 @@ export class PopupCommunicationService {
         sendResponse(JSON.stringify(activeSessions));
       }
     });
-  }
-
-  sendMessageToPopup(message: LeappSessionInfo): void {
-    this.chromeRuntime.sendMessage({ msg: "add-leapp-session", data: message });
   }
 }

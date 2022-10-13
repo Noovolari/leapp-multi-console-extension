@@ -18,7 +18,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [ "background.js" ],
+    "scripts": [ "background-script.js" ],
     "persistent": true
   },
   "permissions": [
@@ -41,7 +41,7 @@
       "all_frames": true,
       "matches": [ "http://*/*", "https://*/*" ],
       "run_at": "document_start",
-      "js": [ "content_script.js" ]
+      "js": [ "content-script.js" ]
     }
   ]
 }

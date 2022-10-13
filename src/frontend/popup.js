@@ -100,7 +100,7 @@ require('./popup.css');
   chrome.runtime.connect({ name: "background-connection" });
 
   chrome.runtime.sendMessage(
-    { type: "get-leapp-sessions" },
+    { type: "session-list-request" },
     (response) => {
       const element = document.getElementById("test");
       const parsedResponse = JSON.parse(response);

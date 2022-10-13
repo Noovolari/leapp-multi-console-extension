@@ -21,7 +21,6 @@ export class TabControllerService {
     } else {
       this.newFirefoxSessionTab(leappPayload.url, sessionKey).then(() => {});
     }
-    this.popupCommunicationService.sendMessageToPopup(leappPayload);
   }
 
   private newChromeSessionTab(url: string) {

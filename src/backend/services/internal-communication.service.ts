@@ -22,7 +22,7 @@ export class InternalCommunicationService {
   }
 
   private routeMessage(port: Port, message: any) {
-    if (message.request == "get-session-id") {
+    if (message.request == constants.sessionIdRequest) {
       this.handleGetSessionId(port);
     }
   }
@@ -35,7 +35,7 @@ export class InternalCommunicationService {
         sessionToken = `${constants.leappToken}${sessionId}${constants.separatorToken}`;
       }
       port.postMessage({
-        request: "extract-session-id",
+        request: constants.sessionIdResponse,
         content: sessionToken,
       });
     }

@@ -1,3 +1,11 @@
 export const separatorToken = "##";
 export const leappToken = `${separatorToken}LEAPP${separatorToken}`;
 export const defaultSessionId = 0;
+export const newCookieSeparator = "; ";
+export const sessionsCookiesLocalStorageSelector = "##SESSION-COOKIES##";
+export const setCustomCookieEventString = "SET_COOKIE";
+export const getCustomCookieEventString = "GET_COOKIE";
+export const sessionIdRequest = "session-id-request";
+export const sessionIdResponse = "session-id-response";
+export const sessionListRequest = "session-list-request";
+export const sessionListResponse = "session-list-response";
