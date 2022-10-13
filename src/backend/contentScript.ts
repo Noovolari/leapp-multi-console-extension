@@ -2,7 +2,10 @@
 // navigator / userAgent
 // window / cookie
 
+import init from "./init";
 import { leappToken } from "./models/constants";
+
+init();
 
 let sessionToken;
 let port;
@@ -13,9 +16,8 @@ const newCookieSeparator = "; ";
 const sessionsCookiesLocalStorageSelector = "##SESSION-COOKIES##";
 const setCustomCookieEventString = "SET_COOKIE";
 const getCustomCookieEventString = "GET_COOKIE";
-const extractSessionNumberRequest = "extract-session-number";
-const backgroundScriptConnectionName = "background-script-connection";
-const getSessionNumberRequest = "get-ses-num";
+const extractSessionIdRequest = "extract-session-id";
+const getSessionIdRequest = "get-session-id";
 
 // ======= Extracted functions ==
 // ==============================
@@ -54,71 +56,76 @@ const generateCookieSetterGetterOverwriteScript = (): string => {
   );
 };
 
-if (isChrome()) {
-  const injectedScript = generateCookieSetterGetterOverwriteScript();
-
+const injectScriptInDocument = (injectableScript: string) => {
   const script = document.createElement("script");
-  script.appendChild(document.createTextNode(injectedScript));
+  script.appendChild(document.createTextNode(injectableScript));
   (document.head || document.documentElement).appendChild(script);
   script.parentNode.removeChild(script);
+};
 
-  document.addEventListener(setCustomCookieEventString, (event: any) => {
-    const cookie = event.detail;
-    if (sessionToken === null || sessionToken === "") {
-      document.cookie = cookie;
-    } else {
-      document.cookie = sessionToken + cookie.trim();
-    }
-  });
+const customSetCookieEventHandler = (event: any) => {
+  const cookie = event.detail;
+  if (sessionToken === null || sessionToken === "") {
+    document.cookie = cookie;
+  } else {
+    document.cookie = sessionToken + cookie.trim();
+  }
+};
 
-  document.addEventListener(getCustomCookieEventString, () => {
-    let newCookies = "";
-    const cookiesString = document.cookie;
-    const cookiesArray: string[] = [];
+const customGetCookieEventHandler = () => {
+  let newCookies = "";
+  const cookiesString = document.cookie;
+  const cookiesArray: string[] = [];
 
-    if (cookiesString) {
-      cookiesArray.push(...cookiesString.split("; "));
+  if (cookiesString) {
+    cookiesArray.push(...cookiesString.split("; "));
 
-      for (const index in cookiesArray) {
-        if (sessionToken) {
-          // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
-          if (cookiesArray[index].substring(0, sessionToken.length) !== sessionToken) {
-            continue;
-          }
-        } else {
-          // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
-          if (cookiesArray[index].startsWith(leappToken)) {
-            continue;
-          }
+    for (const index in cookiesArray) {
+      if (sessionToken) {
+        // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
+        if (cookiesArray[index].substring(0, sessionToken.length) !== sessionToken) {
+          continue;
         }
-
-        if (newCookies) {
-          newCookies += newCookieSeparator;
+      } else {
+        // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
+        if (cookiesArray[index].startsWith(leappToken)) {
+          continue;
         }
-
-        newCookies += sessionToken ? cookiesArray[index].substring(sessionToken.length) : cookiesArray[index];
       }
-    }
 
-    try {
-      localStorage.setItem(sessionsCookiesLocalStorageSelector, newCookies);
-    } catch (err) {
-      if (!document.getElementById(sessionsCookiesLocalStorageSelector)) {
-        const index = document.createElement("div");
-        index.setAttribute("id", sessionsCookiesLocalStorageSelector);
-        document.documentElement.appendChild(index);
-        index.style.display = "none";
+      if (newCookies) {
+        newCookies += newCookieSeparator;
       }
-      (document.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
+
+      newCookies += sessionToken ? cookiesArray[index].substring(sessionToken.length) : cookiesArray[index];
     }
-  });
+  }
+
+  try {
+    localStorage.setItem(sessionsCookiesLocalStorageSelector, newCookies);
+  } catch (err) {
+    if (!document.getElementById(sessionsCookiesLocalStorageSelector)) {
+      const index = document.createElement("div");
+      index.setAttribute("id", sessionsCookiesLocalStorageSelector);
+      document.documentElement.appendChild(index);
+      index.style.display = "none";
+    }
+    (document.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
+  }
+};
+
+if (isChrome()) {
+  const injectableScript = generateCookieSetterGetterOverwriteScript();
+  injectScriptInDocument(injectableScript);
+  document.addEventListener(setCustomCookieEventString, (event) => customSetCookieEventHandler(event));
+  document.addEventListener(getCustomCookieEventString, () => customGetCookieEventHandler());
 }
 
 try {
-  port = chrome.runtime.connect({ name: backgroundScriptConnectionName });
+  port = (window as any).internalCommunicationService.connectToBackgroundScript();
 
   port.onMessage.addListener((message) => {
-    if (message.request === extractSessionNumberRequest) {
+    if (message.request === extractSessionIdRequest) {
       if (message.content) {
         sessionToken = message.content;
       } else {
@@ -127,7 +134,7 @@ try {
     }
   });
 
-  port.postMessage({ request: getSessionNumberRequest });
+  port.postMessage({ request: getSessionIdRequest });
   port.onDisconnect.addListener(() => console.log("port disconnected"));
 } catch (err) {
   console.error(err);
