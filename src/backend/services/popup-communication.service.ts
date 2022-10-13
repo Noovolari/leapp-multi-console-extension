@@ -1,5 +1,5 @@
 import { ExtensionStateService } from "./extension-state.service";
-import { sessionListRequest } from "../models/constants";
+import { focusTab, sessionListRequest } from "../models/constants";
 
 export class PopupCommunicationService {
   constructor(private chromeRuntime: typeof chrome.runtime, private state: ExtensionStateService) {}
@@ -15,6 +15,12 @@ export class PopupCommunicationService {
         });
         console.log(JSON.stringify(activeSessions));
         sendResponse(JSON.stringify(activeSessions));
+      }
+      if (request.type === focusTab) {
+        const updateProperties = { active: true };
+        const tabId = request.tabId;
+        chrome.tabs.update(tabId, updateProperties, (_) => {});
+        sendResponse("done");
       }
     });
   }

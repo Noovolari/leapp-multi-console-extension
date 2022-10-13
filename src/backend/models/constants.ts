@@ -8,4 +8,4 @@ export const getCustomCookieEventString = "GET_COOKIE";
 export const sessionIdRequest = "session-id-request";
 export const sessionIdResponse = "session-id-response";
 export const sessionListRequest = "session-list-request";
-export const sessionListResponse = "session-list-response";
+export const focusTab = "focus-tab";

@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans%7CRoboto:400,500,700&display=swap");
 @import url("https://fonts.googleapis.com/icon?family=Material+Icons%7CMaterial+Icons+Outlined");
 
-/* normalize css starts here */
 *,
 *::before,
 *::after {
@@ -9,7 +8,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-/* normalize css ends here */
 
 html {
   margin: 0;
@@ -18,16 +16,27 @@ html {
 
 body {
   width: 350px;
-  height: 500px;
+  height: 450px;
 }
 
 .header {
-  text-align: center;
+  text-align: left;
   padding-top: 9px;
   padding-bottom: 9px;
-  display: block;
-  height: 50px;
+  padding-left: 9px;
+  display: flex;
+  height: 45px;
   background-color: #363336;
+  justify-content: space-between;
+}
+
+.header img {
+  height: 28px;
+}
+
+.menu-icon {
+  opacity: 0.5;
+  padding-right: 9px;
 }
 
 .row {
@@ -41,6 +50,7 @@ body {
 
 .row:hover {
   cursor: pointer;
+  background-color: #6c549a;
 }
 
 .session-name, .session-role {
@@ -67,6 +77,7 @@ body {
 
 #container {
   height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   text-align: center;
@@ -95,4 +106,14 @@ span.badge-region {
   font-weight: 500;
   background-color: #999999 !important;
   color: #ffffff !important;
+}
+
+.first-launch {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  font-size: 15px;
+  color: #dedcdd;
 }
