@@ -20,14 +20,17 @@ require("./popup.css");
             const sessionName = session.data.sessionName;
             const sessionRole = session.data.sessionRole;
             const sessionRegion = session.data.sessionRegion;
+            const sessionType = session.data.sessionType;
             containerElement.innerHTML +=
               `<div class="row" data-session-id="${sessionId}">
-                <img src="icons/aws-dark.png" alt="provider-icon">
+                <img src="icons/${sessionType}.png" alt="provider-icon">
                 <div class="session-info-container">
                     <p class="session-name">Name: ${sessionName}</p>
                     <p class="session-role">Role: ${sessionRole}</p>
                 </div>
-                <span class="badge badge-gray badge-region">${sessionRegion}</span>
+                <div class="badge-container">
+                    <span class="badge badge-gray badge-region">${sessionRegion}</span>
+                </div>
               </div>`
           }
         })

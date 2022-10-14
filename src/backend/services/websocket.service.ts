@@ -5,14 +5,14 @@ export class WebsocketService {
   private connected;
   private ws;
 
-  constructor(private tabControllerService: TabControllerService, public port: number = 8095, public interval: number = 10000) {
+  constructor(private tabControllerService: TabControllerService, public port: number = 8095, public interval: number = 6000) {
     this.connected = false;
     this.ws = null;
   }
 
   listen(): void {
     setInterval(() => {
-      console.log("checking if connected...");
+      console.log("checking if connected");
       if (!this.connected) {
         this.ws = this.createWebsocket(this.port);
 
