@@ -68,7 +68,7 @@ export class CustomDocumentCookieEventsService {
 
   private customSetCookieEventHandler = (event: any) => {
     const cookie = event.detail;
-    if (this.sessionToken === null || this.sessionToken === "") {
+    if (this.sessionToken === null || this.sessionToken === "" || this.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;
     } else {
       this.injectedDocument.cookie = this.sessionToken + cookie.trim();

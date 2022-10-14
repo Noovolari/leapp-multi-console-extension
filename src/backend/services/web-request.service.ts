@@ -13,7 +13,7 @@ export class WebRequestService {
         if (tabId > 0) {
           const tabSessionId = this.state.getSessionIdByTabId(tabId);
           const requestHeaders = data.requestHeaders;
-          if (tabId !== 0 && tabSessionId !== undefined) {
+          if (tabSessionId !== undefined && tabSessionId !== 0) {
             for (const headerKey in requestHeaders) {
               if (requestHeaders[headerKey].name.toLowerCase() === "cookie") {
                 const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
@@ -61,7 +61,7 @@ export class WebRequestService {
         const responseHeaders = data.responseHeaders;
         if (tabId > 0) {
           const tabSessionId = this.state.getSessionIdByTabId(tabId);
-          if (tabSessionId !== 0 && tabSessionId !== undefined) {
+          if (tabSessionId !== undefined && tabSessionId !== 0) {
             for (const headerKey in responseHeaders) {
               if (responseHeaders[headerKey].name.toLowerCase() == "set-cookie") {
                 const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
