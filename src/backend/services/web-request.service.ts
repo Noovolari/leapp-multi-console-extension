@@ -50,7 +50,7 @@ export class WebRequestService {
         }
       },
       {
-        urls: ["https://*/*", "http://*/*"],
+        urls: ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"],
       },
       ["blocking", "requestHeaders", "extraHeaders"]
     );
@@ -75,7 +75,7 @@ export class WebRequestService {
         }
       },
       {
-        urls: ["https://*/*", "http://*/*"],
+        urls: ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"],
       },
       ["blocking", "responseHeaders", "extraHeaders"]
     );

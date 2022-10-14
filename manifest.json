@@ -39,7 +39,7 @@
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": [ "http://*/*", "https://*/*" ],
+      "matches": [ "https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*" ],
       "run_at": "document_start",
       "js": [ "content-script.js" ]
     }
