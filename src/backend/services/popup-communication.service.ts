@@ -13,7 +13,7 @@ export class PopupCommunicationService {
             tabsList: session.tabsList,
           };
         });
-        console.log(JSON.stringify(activeSessions));
+        //console.log(JSON.stringify(activeSessions));
         sendResponse(JSON.stringify(activeSessions));
       }
       if (request.type === focusTab) {

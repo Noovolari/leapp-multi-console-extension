@@ -31,7 +31,7 @@ export class TabControllerService {
 
   private async newFirefoxSessionTab(url: string, sessionKey: string) {
     const container = await browser.contextualIdentities.create({ name: sessionKey, color: "orange", icon: "circle" });
-    this.browserNamespace.tabs.create({
+    await browser.tabs.create({
       url,
       cookieStoreId: container.cookieStoreId,
     });

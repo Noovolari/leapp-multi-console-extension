@@ -13,12 +13,14 @@ export class ExtractSessionIdService {
       const port = this.internalCommunicationService.connectToBackgroundScript();
 
       port.onMessage.addListener((message) => {
+        console.log(message);
         if (message.request === sessionIdResponse) {
           if (message.content) {
             this.customDocumentCookieEventsService.sessionToken = message.content;
-          } else {
-            window.location.reload();
           }
+          // } else {
+          //   window.location.reload();
+          // }
         }
       });
 

@@ -2,7 +2,10 @@ import init from "./init";
 
 init();
 
-(window as any).webRequestService.listen();
+if ((window as any).extensionStateService.isChrome) {
+  (window as any).webRequestService.listen();
+}
+
 (window as any).tabControllerService.listen();
 (window as any).bootstrapService.listen();
 (window as any).internalCommunicationService.listenToContentScriptConnection();

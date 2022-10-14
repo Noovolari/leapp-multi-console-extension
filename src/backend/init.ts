@@ -19,6 +19,7 @@ export default function init(): void {
   let firefoxBrowser;
   if ((window as any).extensionStateService.isFirefox) {
     firefoxBrowser = browser;
+    console.log(firefoxBrowser);
   }
 
   (window as any).tabControllerService =
