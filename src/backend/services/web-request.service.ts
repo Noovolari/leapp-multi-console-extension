@@ -4,7 +4,14 @@ import WebRequestHeadersDetails = chrome.webRequest.WebRequestHeadersDetails;
 import WebResponseHeadersDetails = chrome.webRequest.WebResponseHeadersDetails;
 
 export class WebRequestService {
-  constructor(private chromeWebRequest: typeof chrome.webRequest, private state: ExtensionStateService) {}
+  private fetchingDate;
+  constructor(private chromeWebRequest: typeof chrome.webRequest, private state: ExtensionStateService) {
+    this.fetchingDate = new Date(0);
+  }
+
+  get fetching(): boolean {
+    return new Date().getTime() - this.fetchingDate.getTime() < constants.fetchingThreshold;
+  }
 
   listen(): void {
     chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -14,6 +21,7 @@ export class WebRequestService {
           const tabSessionId = this.state.getSessionIdByTabId(tabId);
           const requestHeaders = data.requestHeaders;
           if (tabSessionId !== undefined && tabSessionId !== 0) {
+            this.fetchingDate = new Date();
             for (const headerKey in requestHeaders) {
               if (requestHeaders[headerKey].name.toLowerCase() === "cookie") {
                 const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
@@ -62,6 +70,7 @@ export class WebRequestService {
         if (tabId > 0) {
           const tabSessionId = this.state.getSessionIdByTabId(tabId);
           if (tabSessionId !== undefined && tabSessionId !== 0) {
+            this.fetchingDate = new Date();
             for (const headerKey in responseHeaders) {
               if (responseHeaders[headerKey].name.toLowerCase() == "set-cookie") {
                 const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;

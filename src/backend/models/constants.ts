@@ -9,3 +9,4 @@ export const sessionIdRequest = "session-id-request";
 export const sessionIdResponse = "session-id-response";
 export const sessionListRequest = "session-list-request";
 export const focusTab = "focus-tab";
+export const fetchingThreshold = 900;

@@ -1,11 +1,17 @@
 import { TabControllerService } from "./tab-controller.service";
 import { LeappSessionInfo } from "../models/leapp-session-info";
+import { WebRequestService } from "./web-request.service";
 
 export class WebsocketService {
   private connected;
   private ws;
 
-  constructor(private tabControllerService: TabControllerService, public port: number = 8095, public interval: number = 6000) {
+  constructor(
+    private tabControllerService: TabControllerService,
+    private webRequestService: WebRequestService,
+    public port: number = 8095,
+    public interval: number = 6000
+  ) {
     this.connected = false;
     this.ws = null;
   }
@@ -22,10 +28,14 @@ export class WebsocketService {
         };
 
         this.ws.onmessage = (event) => {
-          const payload: LeappSessionInfo = JSON.parse(event.data);
-          console.log("received: %s", payload);
-          this.tabControllerService.openNewSessionTab(payload);
-          this.ws.send("payload from Leapp received correctly");
+          const message = JSON.parse(event.data);
+          if (message.type === "create-new-session") {
+            const payload: LeappSessionInfo = message.sessionInfo;
+            this.tabControllerService.openNewSessionTab(payload);
+            this.ws.send(JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
+          } else if (message.type === "get-fetching-state") {
+            this.ws.send(JSON.stringify({ type: "send-fetching-state", fetching: this.webRequestService.fetching }));
+          }
         };
 
         this.ws.onclose = (_) => {
