@@ -8,37 +8,47 @@ import { CustomDocumentCookieEventsService } from "./services/custom-document-co
 import { ExtractSessionIdService } from "./services/extract-session-id.service";
 import { PopupCommunicationService } from "./services/popup-communication.service";
 
-export default function init(): void {
-  (window as any).extensionStateService = (window as any).extensionStateService || new ExtensionStateService(navigator);
+export interface Providers {
+  extensionStateService: ExtensionStateService;
+  webRequestService: WebRequestService;
+  tabControllerService: TabControllerService;
+  bootstrapService: BootstrapService;
+  internalCommunicationService: InternalCommunicationService;
+  webSocketService: WebsocketService;
+  customDocumentCookieEventsService: CustomDocumentCookieEventsService;
+  extractSessionIdService: ExtractSessionIdService;
+  popupCommunicationService: PopupCommunicationService;
+}
 
-  if ((window as any).extensionStateService.isChrome) {
-    (window as any).webRequestService =
-      (window as any).webRequestService || new WebRequestService(chrome.webRequest, (window as any).extensionStateService);
+export default function init(): void {
+  const providers = {} as Providers;
+  providers.extensionStateService = new ExtensionStateService(navigator);
+
+  if (providers.extensionStateService.isChrome) {
+    providers.webRequestService = new WebRequestService(chrome.webRequest, providers.extensionStateService);
   }
 
   let firefoxBrowser;
-  if ((window as any).extensionStateService.isFirefox) {
+  if (providers.extensionStateService.isFirefox) {
     firefoxBrowser = browser;
-    console.log(firefoxBrowser);
   }
 
-  (window as any).tabControllerService =
-    (window as any).tabControllerService || new TabControllerService(chrome, (window as any).extensionStateService, firefoxBrowser);
+  providers.tabControllerService = new TabControllerService(chrome, providers.extensionStateService, firefoxBrowser);
 
-  (window as any).bootstrapService = (window as any).bootstrapService || new BootstrapService(window, chrome, (window as any).extensionStateService);
+  providers.bootstrapService = new BootstrapService(window, chrome, providers.extensionStateService);
 
-  (window as any).internalCommunicationService =
-    (window as any).internalCommunicationService || new InternalCommunicationService(chrome.runtime, (window as any).extensionStateService);
+  providers.internalCommunicationService = new InternalCommunicationService(chrome.runtime, providers.extensionStateService);
 
-  (window as any).webSocketService = (window as any).webSocketService || new WebsocketService((window as any).tabControllerService);
+  providers.webSocketService = new WebsocketService(providers.tabControllerService);
 
-  (window as any).customDocumentCookieEventsService =
-    (window as any).customDocumentCookieEventsService || new CustomDocumentCookieEventsService(document, localStorage, navigator);
+  providers.customDocumentCookieEventsService = new CustomDocumentCookieEventsService(document, localStorage, navigator);
 
-  (window as any).extractSessionIdService =
-    (window as any).extractSessionIdService ||
-    new ExtractSessionIdService((window as any).internalCommunicationService, (window as any).customDocumentCookieEventsService);
+  providers.extractSessionIdService = new ExtractSessionIdService(
+    providers.internalCommunicationService,
+    providers.customDocumentCookieEventsService
+  );
 
-  (window as any).popupCommunicationService =
-    (window as any).popupCommunicationService || new PopupCommunicationService(chrome.runtime, (window as any).extensionStateService);
+  providers.popupCommunicationService = new PopupCommunicationService(chrome.runtime, providers.extensionStateService);
+
+  (window as any).providers = providers;
 }

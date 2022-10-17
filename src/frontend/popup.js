@@ -9,20 +9,22 @@ require("./popup.css");
     { type: "session-list-request" },
     (response) => {
       const containerElement = document.getElementById("container");
-      const parsedResponse = JSON.parse(response);
+      const sessionList = JSON.parse(response);
       sessions.push([]);
-      if(parsedResponse.length === 1) {
+      const tabsListSum = sessionList.filter((session) => session.data).map((response) => response.tabsList.length).reduce((prev, curr) => prev + curr, 0);
+      if(tabsListSum === 0) {
         containerElement.innerHTML += `<p class="first-launch">Start by opening a session from Leapp</p>`
       } else {
-        parsedResponse.forEach((session, sessionId) => {
+        sessionList.forEach((session, sessionId) => {
           if(session.data) {
             sessions.push(session.tabsList);
-            const sessionName = session.data.sessionName;
-            const sessionRole = session.data.sessionRole;
-            const sessionRegion = session.data.sessionRegion;
-            const sessionType = session.data.sessionType;
-            containerElement.innerHTML +=
-              `<div class="row" data-session-id="${sessionId}">
+            if(session.tabsList.length > 0){
+              const sessionName = session.data.sessionName;
+              const sessionRole = session.data.sessionRole;
+              const sessionRegion = session.data.sessionRegion;
+              const sessionType = session.data.sessionType;
+              containerElement.innerHTML +=
+                `<div class="row" data-session-id="${sessionId}">
                 <img src="icons/${sessionType}.png" alt="provider-icon">
                 <div class="session-info-container">
                     <p class="session-name">Name: ${sessionName}</p>
@@ -32,6 +34,7 @@ require("./popup.css");
                     <span class="badge badge-gray badge-region">${sessionRegion}</span>
                 </div>
               </div>`
+            }
           }
         })
       }

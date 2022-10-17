@@ -14,7 +14,7 @@ export class TabControllerService {
   openNewSessionTab(leappPayload: LeappSessionInfo): void {
     const sessionId = this.state.sessionCounter;
     const sessionKey = `session-${sessionId}`;
-    this.state.createNewIsolatedSession(sessionId, leappPayload);
+    this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined });
     this.state.nextSessionId = this.state.sessionCounter++;
     if (this.state.isChrome) {
       this.newChromeSessionTab(leappPayload.url);

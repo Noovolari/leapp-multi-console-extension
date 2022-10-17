@@ -1,6 +1,7 @@
-import init from "./init";
+import init, { Providers } from "./init";
 
 init();
 
-(window as any).customDocumentCookieEventsService.listen();
-(window as any).extractSessionIdService.listen();
+const providers: Providers = (window as any).providers;
+providers.customDocumentCookieEventsService.listen();
+providers.extractSessionIdService.listen();

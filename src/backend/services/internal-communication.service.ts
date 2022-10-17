@@ -18,7 +18,7 @@ export class InternalCommunicationService {
   }
 
   connectToBackgroundScript(): Port {
-    return chrome.runtime.connect({ name: this.backgroundScriptConnectionName });
+    return this.chromeRuntime.connect({ name: this.backgroundScriptConnectionName });
   }
 
   private routeMessage(port: Port, message: any) {

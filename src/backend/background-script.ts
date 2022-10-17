@@ -1,13 +1,15 @@
-import init from "./init";
+import init, { Providers } from "./init";
 
 init();
 
-if ((window as any).extensionStateService.isChrome) {
-  (window as any).webRequestService.listen();
+const providers: Providers = (window as any).providers;
+
+if (providers.extensionStateService.isChrome) {
+  providers.webRequestService.listen();
 }
 
-(window as any).tabControllerService.listen();
-(window as any).bootstrapService.listen();
-(window as any).internalCommunicationService.listenToContentScriptConnection();
-(window as any).popupCommunicationService.listen();
-(window as any).webSocketService.listen();
+providers.tabControllerService.listen();
+providers.bootstrapService.listen();
+providers.internalCommunicationService.listenToContentScriptConnection();
+providers.popupCommunicationService.listen();
+providers.webSocketService.listen();
