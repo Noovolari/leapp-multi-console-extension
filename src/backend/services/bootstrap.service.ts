@@ -1,6 +1,4 @@
 import { ExtensionStateService } from "./extension-state.service";
-import Cookie = chrome.cookies.Cookie;
-import Details = chrome.cookies.Details;
 import * as constants from "../models/constants";
 
 export class BootstrapService {
@@ -13,12 +11,12 @@ export class BootstrapService {
         for (const tab of tabs) {
           this.state.addTabToSession(tab.id, constants.defaultSessionId);
         }
-        this.chromeNamespace.cookies.getAll({}, (cookies: Cookie[]) => {
+        this.chromeNamespace.cookies.getAll({}, (cookies: any[]) => {
           for (const cookie of cookies) {
             if (cookie.name.startsWith(constants.leappToken)) {
               const cookieProtocol = cookie.secure ? "https://" : "http://";
               const cookieURL = cookieProtocol + cookie.domain + cookie.path;
-              this.chromeNamespace.cookies.remove({ url: cookieURL, name: cookie.name }, (_: Details) => {});
+              this.chromeNamespace.cookies.remove({ url: cookieURL, name: cookie.name }, (_: any) => {});
             }
           }
         });
