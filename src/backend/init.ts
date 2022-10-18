@@ -28,12 +28,7 @@ export default function init(): void {
     providers.webRequestService = new WebRequestService(chrome.webRequest, providers.extensionStateService);
   }
 
-  let firefoxBrowser;
-  if (providers.extensionStateService.isFirefox) {
-    firefoxBrowser = browser;
-  }
-
-  providers.tabControllerService = new TabControllerService(chrome, providers.extensionStateService, firefoxBrowser);
+  providers.tabControllerService = new TabControllerService(chrome, providers.extensionStateService);
 
   providers.bootstrapService = new BootstrapService(window, chrome, providers.extensionStateService);
 
@@ -48,7 +43,7 @@ export default function init(): void {
     providers.customDocumentCookieEventsService
   );
 
-  providers.popupCommunicationService = new PopupCommunicationService(chrome.runtime, providers.extensionStateService);
+  providers.popupCommunicationService = new PopupCommunicationService(chrome, providers.extensionStateService);
 
   (window as any).providers = providers;
 }

@@ -28,12 +28,12 @@ export class CustomDocumentCookieEventsService {
     }
   }
 
-  private injectScriptInDocument = (injectableScript: string) => {
+  private injectScriptInDocument(injectableScript: string) {
     const script = this.injectedDocument.createElement("script");
     script.appendChild(this.injectedDocument.createTextNode(injectableScript));
     (this.injectedDocument.head || this.injectedDocument.documentElement).appendChild(script);
     script.parentNode.removeChild(script);
-  };
+  }
 
   // Overrides document.cookie behaviour: when a cookie is SET customCookieSetFunction is called,
   // likewise if all cookies are obtained, customCookieGetFunction is called.
