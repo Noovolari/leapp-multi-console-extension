@@ -1,7 +1,7 @@
 import { describe, beforeEach, afterAll, test, jest, expect } from "@jest/globals";
 import { WebRequestService } from "./web-request.service";
 
-describe("ExtensionStateService", () => {
+describe("WebRequestService", () => {
   let service: any;
   let chromeWebRequest: any;
   let extensionStateService: any;
