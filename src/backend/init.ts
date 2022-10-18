@@ -34,7 +34,7 @@ export default function init(): void {
 
   providers.internalCommunicationService = new InternalCommunicationService(chrome.runtime, providers.extensionStateService);
 
-  providers.webSocketService = new WebsocketService(providers.tabControllerService, providers.webRequestService);
+  providers.webSocketService = new WebsocketService(providers.tabControllerService, providers.webRequestService, WebSocket);
 
   providers.customDocumentCookieEventsService = new CustomDocumentCookieEventsService(document, localStorage, navigator);
 
