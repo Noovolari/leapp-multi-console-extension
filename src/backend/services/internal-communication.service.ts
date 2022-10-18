@@ -1,5 +1,4 @@
 import { ExtensionStateService } from "./extension-state.service";
-import Port = chrome.runtime.Port;
 import * as constants from "../models/constants";
 
 export class InternalCommunicationService {
@@ -10,24 +9,24 @@ export class InternalCommunicationService {
   }
 
   listenToContentScriptConnection(): void {
-    this.chromeRuntime.onConnect.addListener((port: Port) => {
+    this.chromeRuntime.onConnect.addListener((port: any) => {
       port.onMessage.addListener((message: any) => {
         this.routeMessage(port, message);
       });
     });
   }
 
-  connectToBackgroundScript(): Port {
+  connectToBackgroundScript(): any {
     return this.chromeRuntime.connect({ name: this.backgroundScriptConnectionName });
   }
 
-  private routeMessage(port: Port, message: any) {
+  private routeMessage(port: any, message: any) {
     if (message.request == constants.sessionIdRequest) {
       this.handleGetSessionId(port);
     }
   }
 
-  private handleGetSessionId(port: Port): void {
+  private handleGetSessionId(port: any): void {
     if (port.sender.tab) {
       let sessionToken = "";
       const sessionId = this.state.getSessionIdByTabId(port.sender.tab.id);
