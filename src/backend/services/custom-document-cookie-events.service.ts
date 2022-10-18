@@ -5,27 +5,16 @@ import {
   sessionsCookiesLocalStorageSelector,
   setCustomCookieEventString,
 } from "../models/constants";
+import { ExtensionStateService } from "./extension-state.service";
 
 export class CustomDocumentCookieEventsService {
-  private _sessionToken: string;
-
-  constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private injectedNavigator: Navigator) {}
-
-  set sessionToken(value: string) {
-    this._sessionToken = value;
-  }
-
-  get sessionToken(): string {
-    return this._sessionToken;
-  }
+  constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private state: ExtensionStateService) {}
 
   listen(): void {
-    if (this.isChrome()) {
-      const injectableScript = CustomDocumentCookieEventsService.generateCookieSetterGetterOverwriteScript();
-      this.injectScriptInDocument(injectableScript);
-      this.injectedDocument.addEventListener(setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
-      this.injectedDocument.addEventListener(getCustomCookieEventString, () => this.customGetCookieEventHandler());
-    }
+    const injectableScript = CustomDocumentCookieEventsService.generateCookieSetterGetterOverwriteScript();
+    this.injectScriptInDocument(injectableScript);
+    this.injectedDocument.addEventListener(setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
+    this.injectedDocument.addEventListener(getCustomCookieEventString, () => this.customGetCookieEventHandler());
   }
 
   private injectScriptInDocument(injectableScript: string) {
@@ -68,10 +57,10 @@ export class CustomDocumentCookieEventsService {
 
   private customSetCookieEventHandler = (event: any) => {
     const cookie = event.detail;
-    if (this.sessionToken === null || this.sessionToken === "" || this.sessionToken === undefined) {
+    if (this.state.sessionToken === null || this.state.sessionToken === "" || this.state.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;
     } else {
-      this.injectedDocument.cookie = this.sessionToken + cookie.trim();
+      this.injectedDocument.cookie = this.state.sessionToken + cookie.trim();
     }
   };
 
@@ -84,9 +73,9 @@ export class CustomDocumentCookieEventsService {
       cookiesArray.push(...cookiesString.split("; "));
 
       for (const index in cookiesArray) {
-        if (this.sessionToken) {
+        if (this.state.sessionToken) {
           // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
-          if (cookiesArray[index].substring(0, this.sessionToken.length) !== this.sessionToken) {
+          if (cookiesArray[index].substring(0, this.state.sessionToken.length) !== this.state.sessionToken) {
             continue;
           }
         } else {
@@ -100,7 +89,7 @@ export class CustomDocumentCookieEventsService {
           newCookies += newCookieSeparator;
         }
 
-        newCookies += this.sessionToken ? cookiesArray[index].substring(this.sessionToken.length) : cookiesArray[index];
+        newCookies += this.state.sessionToken ? cookiesArray[index].substring(this.state.sessionToken.length) : cookiesArray[index];
       }
     }
 
@@ -116,6 +105,4 @@ export class CustomDocumentCookieEventsService {
       (this.injectedDocument.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
     }
   };
-
-  private isChrome = (): boolean => this.injectedNavigator.userAgent.indexOf("Chrome") > 0;
 }

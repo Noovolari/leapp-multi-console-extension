@@ -5,6 +5,7 @@ export class ExtensionStateService {
   private readonly userAgent: string;
   private readonly hashedSessions: number[];
   public isolatedSessions: IsolatedSession[];
+  private _sessionToken: string;
   private _sessionCounter: number;
   private _nextSessionId: number;
 
@@ -22,6 +23,14 @@ export class ExtensionStateService {
 
   get isFirefox(): boolean {
     return this.userAgent.includes("Mozilla");
+  }
+
+  set sessionToken(value: string) {
+    this._sessionToken = value;
+  }
+
+  get sessionToken(): string {
+    return this._sessionToken;
   }
 
   get sessionCounter(): number {

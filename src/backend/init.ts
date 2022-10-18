@@ -26,6 +26,7 @@ export default function init(): void {
 
   if (providers.extensionStateService.isChrome) {
     providers.webRequestService = new WebRequestService(chrome.webRequest, providers.extensionStateService);
+    providers.customDocumentCookieEventsService = new CustomDocumentCookieEventsService(document, localStorage, providers.extensionStateService);
   }
 
   providers.tabControllerService = new TabControllerService(chrome, providers.extensionStateService);
@@ -36,12 +37,7 @@ export default function init(): void {
 
   providers.webSocketService = new WebsocketService(providers.tabControllerService, providers.webRequestService, WebSocket);
 
-  providers.customDocumentCookieEventsService = new CustomDocumentCookieEventsService(document, localStorage, navigator);
-
-  providers.extractSessionIdService = new ExtractSessionIdService(
-    providers.internalCommunicationService,
-    providers.customDocumentCookieEventsService
-  );
+  providers.extractSessionIdService = new ExtractSessionIdService(providers.internalCommunicationService, providers.extensionStateService);
 
   providers.popupCommunicationService = new PopupCommunicationService(chrome, providers.extensionStateService);
 

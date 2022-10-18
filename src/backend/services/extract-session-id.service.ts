@@ -1,12 +1,9 @@
 import { sessionIdRequest, sessionIdResponse } from "../models/constants";
 import { InternalCommunicationService } from "./internal-communication.service";
-import { CustomDocumentCookieEventsService } from "./custom-document-cookie-events.service";
+import { ExtensionStateService } from "./extension-state.service";
 
 export class ExtractSessionIdService {
-  constructor(
-    private internalCommunicationService: InternalCommunicationService,
-    private customDocumentCookieEventsService: CustomDocumentCookieEventsService
-  ) {}
+  constructor(private internalCommunicationService: InternalCommunicationService, private state: ExtensionStateService) {}
 
   listen(): void {
     try {
@@ -16,11 +13,8 @@ export class ExtractSessionIdService {
         console.log(message);
         if (message.request === sessionIdResponse) {
           if (message.content) {
-            this.customDocumentCookieEventsService.sessionToken = message.content;
+            this.state.sessionToken = message.content;
           }
-          // } else {
-          //   window.location.reload();
-          // }
         }
       });
 
