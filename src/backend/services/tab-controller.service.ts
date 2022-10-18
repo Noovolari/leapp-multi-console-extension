@@ -1,15 +1,12 @@
-import Tab = chrome.tabs.Tab;
 import { ExtensionStateService } from "./extension-state.service";
 import { LeappSessionInfo } from "../models/leapp-session-info";
-import { PopupCommunicationService } from "./popup-communication.service";
 
 export class TabControllerService {
-  constructor(
-    private chromeNamespace: typeof chrome,
-    private state: ExtensionStateService,
-    private popupCommunicationService: PopupCommunicationService,
-    private browserNamespace?: typeof browser
-  ) {}
+  constructor(private chromeNamespace: typeof chrome, private state: ExtensionStateService) {}
+
+  getBrowser(): any {
+    return browser;
+  }
 
   openNewSessionTab(leappPayload: LeappSessionInfo): void {
     const sessionId = this.state.sessionCounter;
@@ -30,19 +27,19 @@ export class TabControllerService {
   }
 
   private async newFirefoxSessionTab(url: string, sessionKey: string) {
-    const container = await browser.contextualIdentities.create({ name: sessionKey, color: "orange", icon: "circle" });
-    await browser.tabs.create({
+    const container = await this.getBrowser().contextualIdentities.create({ name: sessionKey, color: "orange", icon: "circle" });
+    await this.getBrowser().tabs.create({
       url,
       cookieStoreId: container.cookieStoreId,
     });
   }
 
   listen(): void {
-    this.chromeNamespace.tabs.onCreated.addListener((tab: Tab) => this.handleCreated(tab));
+    this.chromeNamespace.tabs.onCreated.addListener((tab: any) => this.handleCreated(tab));
     this.chromeNamespace.tabs.onRemoved.addListener((tabId: number) => this.handleRemoved(tabId));
   }
 
-  private handleCreated(tab: Tab): void {
+  private handleCreated(tab: any): void {
     if (tab.openerTabId) {
       const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
       this.state.addTabToSession(tab.id, currentSessionId);
