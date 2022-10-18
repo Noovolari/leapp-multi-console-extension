@@ -1,10 +1,11 @@
 import { ExtensionStateService } from "./extension-state.service";
 import * as constants from "../models/constants";
-import WebRequestHeadersDetails = chrome.webRequest.WebRequestHeadersDetails;
-import WebResponseHeadersDetails = chrome.webRequest.WebResponseHeadersDetails;
+
+const awsConsoleUrls = ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"];
 
 export class WebRequestService {
   private fetchingDate;
+
   constructor(private chromeWebRequest: typeof chrome.webRequest, private state: ExtensionStateService) {
     this.fetchingDate = new Date(0);
   }
@@ -14,79 +15,74 @@ export class WebRequestService {
   }
 
   listen(): void {
-    chrome.webRequest.onBeforeSendHeaders.addListener(
-      (data: WebRequestHeadersDetails) => {
-        const tabId = data.tabId;
-        if (tabId > 0) {
-          const tabSessionId = this.state.getSessionIdByTabId(tabId);
-          const requestHeaders = data.requestHeaders;
-          if (tabSessionId !== undefined && tabSessionId !== 0) {
-            this.fetchingDate = new Date();
-            for (const headerKey in requestHeaders) {
-              if (requestHeaders[headerKey].name.toLowerCase() === "cookie") {
-                const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
-                const newCookiesString = [];
-                for (const index in cleanCookiesString) {
-                  const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-                  if (cleanCookiesString[index].startsWith(sessionString)) {
-                    const slicingPoint =
-                      cleanCookiesString[index].indexOf(`${constants.separatorToken}`, `${constants.leappToken}`.length) +
-                      `${constants.separatorToken}`.length;
-                    newCookiesString.push(cleanCookiesString[index].slice(slicingPoint));
-                  }
-                }
-                requestHeaders[headerKey].value = newCookiesString.join("; ");
-              }
-            }
-          } else {
-            for (const headerKey in requestHeaders) {
-              if (requestHeaders[headerKey].name.toLowerCase() === "cookie") {
-                const cleanCookiesString = requestHeaders[headerKey].value.split("; ");
-                const newCookiesString = [];
-                for (const index in cleanCookiesString) {
-                  if (!cleanCookiesString[index].startsWith(`${constants.leappToken}`)) {
-                    newCookiesString.push(cleanCookiesString[index]);
-                  }
-                }
-                requestHeaders[headerKey].value = newCookiesString.join("; ");
-              }
-            }
-          }
-          return {
-            requestHeaders,
-          };
-        }
-      },
-      {
-        urls: ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"],
-      },
-      ["blocking", "requestHeaders", "extraHeaders"]
-    );
+    this.chromeWebRequest.onBeforeSendHeaders.addListener((d) => this.onBeforeSendHeadersCallback(d), { urls: awsConsoleUrls }, [
+      "blocking",
+      "requestHeaders",
+      "extraHeaders",
+    ]);
 
-    chrome.webRequest.onHeadersReceived.addListener(
-      (data: WebResponseHeadersDetails) => {
-        const tabId = data.tabId;
-        const responseHeaders = data.responseHeaders;
-        if (tabId > 0) {
-          const tabSessionId = this.state.getSessionIdByTabId(tabId);
-          if (tabSessionId !== undefined && tabSessionId !== 0) {
-            this.fetchingDate = new Date();
-            for (const headerKey in responseHeaders) {
-              if (responseHeaders[headerKey].name.toLowerCase() == "set-cookie") {
-                const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-                responseHeaders[headerKey].value = sessionString + responseHeaders[headerKey].value;
+    this.chromeWebRequest.onHeadersReceived.addListener((d) => this.onHeadersReceivedCallback(d), { urls: awsConsoleUrls }, [
+      "blocking",
+      "responseHeaders",
+      "extraHeaders",
+    ]);
+  }
+
+  private onBeforeSendHeadersCallback(data: any) {
+    const tabId = data.tabId;
+    if (tabId > 0) {
+      const tabSessionId = this.state.getSessionIdByTabId(tabId);
+      const requestHeaders = data.requestHeaders;
+      if (tabSessionId !== undefined && tabSessionId !== 0) {
+        this.fetchingDate = new Date();
+        for (const requestHeader of requestHeaders) {
+          if (requestHeader.name.toLowerCase() === "cookie") {
+            const cookieValues = requestHeader.value.split("; ");
+            const newCookieValues = [];
+            for (const cookieValue of cookieValues) {
+              const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
+              if (cookieValue.startsWith(sessionString)) {
+                const slicingPoint =
+                  cookieValue.indexOf(constants.separatorToken, `${constants.leappToken}`.length) + `${constants.separatorToken}`.length;
+                newCookieValues.push(cookieValue.slice(slicingPoint));
               }
             }
-            return {
-              responseHeaders,
-            };
+            requestHeader.value = newCookieValues.join("; ");
           }
         }
-      },
-      {
-        urls: ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"],
-      },
-      ["blocking", "responseHeaders", "extraHeaders"]
-    );
+      } else {
+        for (const requestHeader of requestHeaders) {
+          if (requestHeader.name.toLowerCase() === "cookie") {
+            const cookieValues = requestHeader.value.split("; ");
+            const newCookieValues = [];
+            for (const cookieValue of cookieValues) {
+              if (!cookieValue.startsWith(constants.leappToken)) {
+                newCookieValues.push(cookieValue);
+              }
+            }
+            requestHeader.value = newCookieValues.join("; ");
+          }
+        }
+      }
+      return { requestHeaders };
+    }
+  }
+
+  private onHeadersReceivedCallback(data: any) {
+    const tabId = data.tabId;
+    if (tabId > 0) {
+      const responseHeaders = data.responseHeaders;
+      const tabSessionId = this.state.getSessionIdByTabId(tabId);
+      if (tabSessionId !== undefined && tabSessionId !== 0) {
+        this.fetchingDate = new Date();
+        for (const responseHeader of responseHeaders) {
+          if (responseHeader.name.toLowerCase() === "set-cookie") {
+            const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
+            responseHeader.value = sessionString + responseHeader.value;
+          }
+        }
+        return { responseHeaders };
+      }
+    }
   }
 }

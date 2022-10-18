@@ -17,11 +17,11 @@ export class ExtensionStateService {
   }
 
   get isChrome(): boolean {
-    return this.userAgent.indexOf("Chrome") > 0;
+    return this.userAgent.includes("Chrome");
   }
 
   get isFirefox(): boolean {
-    return this.userAgent.indexOf("Mozilla") > 0;
+    return this.userAgent.includes("Mozilla");
   }
 
   get sessionCounter(): number {
