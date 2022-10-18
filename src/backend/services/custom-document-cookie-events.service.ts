@@ -6,12 +6,13 @@ import {
   setCustomCookieEventString,
 } from "../models/constants";
 import { ExtensionStateService } from "./extension-state.service";
+import * as constants from "../models/constants";
 
 export class CustomDocumentCookieEventsService {
   constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private state: ExtensionStateService) {}
 
   listen(): void {
-    const injectableScript = CustomDocumentCookieEventsService.generateCookieSetterGetterOverwriteScript();
+    const injectableScript = this.generateCookieSetterGetterOverwriteScript();
     this.injectScriptInDocument(injectableScript);
     this.injectedDocument.addEventListener(setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
     this.injectedDocument.addEventListener(getCustomCookieEventString, () => this.customGetCookieEventHandler());
@@ -26,45 +27,45 @@ export class CustomDocumentCookieEventsService {
 
   // Overrides document.cookie behaviour: when a cookie is SET customCookieSetFunction is called,
   // likewise if all cookies are obtained, customCookieGetFunction is called.
-  private static generateCookieSetterGetterOverwriteScript = (): string => {
+  private generateCookieSetterGetterOverwriteScript(): string {
     return (
-      "(" +
-      function () {
-        Object.defineProperty(document, "cookie", {
-          set: (cookieToSet): void => {
-            const event = new CustomEvent("SET_COOKIE", {
-              detail: cookieToSet,
-            });
-            document.dispatchEvent(event);
-          },
-          get: (): string => {
-            const event = new CustomEvent("GET_COOKIE");
-            document.dispatchEvent(event);
-            let cookies;
-            try {
-              cookies = localStorage.getItem("##SESSION-COOKIES##");
-              localStorage.removeItem("##SESSION-COOKIES##");
-            } catch (e) {
-              cookies = document.getElementById("##SESSION-COOKIES##").innerText;
-            }
-            return cookies;
-          },
-        });
-      } +
-      ")();"
+      "(function () {\n" +
+      '      Object.defineProperty(document, "cookie", {\n' +
+      "        set: cookieToSet => {\n" +
+      `          const event = new CustomEvent("${constants.setCustomCookieEventString}", {\n` +
+      "            detail: cookieToSet\n" +
+      "          });\n" +
+      "          document.dispatchEvent(event);\n" +
+      "        },\n" +
+      "        get: () => {\n" +
+      `          const event = new CustomEvent("${constants.getCustomCookieEventString}");\n` +
+      "          document.dispatchEvent(event);\n" +
+      "          let cookies;\n" +
+      "\n" +
+      "          try {\n" +
+      `            cookies = localStorage.getItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
+      `            localStorage.removeItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
+      "          } catch (e) {\n" +
+      `            cookies = document.getElementById("${constants.sessionsCookiesLocalStorageSelector}").innerText;\n` +
+      "          }\n" +
+      "\n" +
+      "          return cookies;\n" +
+      "        }\n" +
+      "      });\n" +
+      "    })();"
     );
-  };
+  }
 
-  private customSetCookieEventHandler = (event: any) => {
+  private customSetCookieEventHandler(event: any): void {
     const cookie = event.detail;
     if (this.state.sessionToken === null || this.state.sessionToken === "" || this.state.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;
     } else {
       this.injectedDocument.cookie = this.state.sessionToken + cookie.trim();
     }
-  };
+  }
 
-  private customGetCookieEventHandler = () => {
+  private customGetCookieEventHandler(): void {
     let newCookies = "";
     const cookiesString = this.injectedDocument.cookie;
     const cookiesArray: string[] = [];
@@ -104,5 +105,5 @@ export class CustomDocumentCookieEventsService {
       }
       (this.injectedDocument.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
     }
-  };
+  }
 }
