@@ -33,6 +33,11 @@ describe("ExtensionStateService", () => {
     expect(service.isFirefox).toBe(false);
   });
 
+  test("sessionToken", () => {
+    service.sessionToken = "fake-session-token";
+    expect(service.sessionToken).toBe("fake-session-token");
+  });
+
   test("sessionCounter", () => {
     service.sessionCounter = 42;
     expect(service.sessionCounter).toBe(42);
