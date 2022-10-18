@@ -9,6 +9,7 @@ export class WebsocketService {
   constructor(
     private tabControllerService: TabControllerService,
     private webRequestService: WebRequestService,
+    private webSocketClass: typeof WebSocket,
     public port: number = 8095,
     public interval: number = 6000
   ) {
@@ -52,6 +53,6 @@ export class WebsocketService {
   }
 
   private createWebsocket(port: number): WebSocket {
-    return new WebSocket(`ws://localhost:${port}`);
+    return new this.webSocketClass(`ws://localhost:${port}`);
   }
 }
