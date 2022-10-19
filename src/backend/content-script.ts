@@ -1,8 +1,6 @@
-import init, { Providers } from "./init";
+import initProviders from "./initProviders";
 
-init();
-
-const providers: Providers = (window as any).providers;
+const providers = initProviders();
 
 if (providers.extensionStateService.isChrome) {
   providers.customDocumentCookieEventsService.listen();
