@@ -7,18 +7,7 @@ import { InternalCommunicationService } from "./services/internal-communication.
 import { CustomDocumentCookieEventsService } from "./services/custom-document-cookie-events.service";
 import { ExtractSessionIdService } from "./services/extract-session-id.service";
 import { PopupCommunicationService } from "./services/popup-communication.service";
-
-export interface Providers {
-  extensionStateService: ExtensionStateService;
-  webRequestService: WebRequestService;
-  tabControllerService: TabControllerService;
-  bootstrapService: BootstrapService;
-  internalCommunicationService: InternalCommunicationService;
-  webSocketService: WebsocketService;
-  customDocumentCookieEventsService: CustomDocumentCookieEventsService;
-  extractSessionIdService: ExtractSessionIdService;
-  popupCommunicationService: PopupCommunicationService;
-}
+import { Providers } from "./models/providers";
 
 export default function init(): void {
   const providers = {} as Providers;

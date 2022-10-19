@@ -1,4 +1,5 @@
-import init, { Providers } from "./init";
+import init from "./init";
+import { Providers } from "./models/providers";
 
 init();
 
