@@ -1,4 +1,4 @@
-import initProviders from "./initProviders";
+import { initProviders } from "./init-providers";
 
 const providers = initProviders();
 

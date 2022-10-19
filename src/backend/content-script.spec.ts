@@ -1,37 +1,38 @@
-import init from "./init";
-jest.mock("./init");
+import { jest } from "@jest/globals";
 
 describe("ContentScript", () => {
   afterEach(() => {
     jest.resetModules();
+    jest.clearAllMocks();
   });
 
-  test("extensionStateService.isChrome === true", () => {
+  test("extensionStateService.isChrome === true", async () => {
+    const initProviders = await import("./init-providers");
     const providers = {
       extensionStateService: { isChrome: true },
       customDocumentCookieEventsService: { listen: jest.fn() },
       extractSessionIdService: { listen: jest.fn() },
-    };
-    (global as any).window = { providers };
+    } as any;
+    jest.spyOn(initProviders, "initProviders").mockImplementation(() => providers);
 
-    require("./content-script");
+    await import("./content-script");
 
-    expect(init).toHaveBeenCalled();
     expect(providers.customDocumentCookieEventsService.listen).toHaveBeenCalled();
     expect(providers.extractSessionIdService.listen).toHaveBeenCalled();
   });
 
   test("extensionStateService.isChrome === false", async () => {
+    const initProviders = await import("./init-providers");
+
     const providers = {
       extensionStateService: { isChrome: false },
       customDocumentCookieEventsService: { listen: jest.fn() },
       extractSessionIdService: { listen: jest.fn() },
-    };
-    (global as any).window = { providers };
+    } as any;
+    jest.spyOn(initProviders, "initProviders").mockImplementation(() => providers);
 
-    require("./content-script");
+    await import("./content-script");
 
-    expect(init).toHaveBeenCalled();
     expect(providers.customDocumentCookieEventsService.listen).not.toHaveBeenCalled();
     expect(providers.extractSessionIdService.listen).toHaveBeenCalled();
   });

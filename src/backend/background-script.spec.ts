@@ -1,12 +1,13 @@
-import init from "./init";
-jest.mock("./init");
+import { jest } from "@jest/globals";
 
 describe("BackgroundScript", () => {
   afterEach(() => {
     jest.resetModules();
+    jest.clearAllMocks();
   });
 
-  test("extensionStateService.isChrome === true", () => {
+  test("extensionStateService.isChrome === true", async () => {
+    const initProviders = await import("./init-providers");
     const providers = {
       extensionStateService: { isChrome: true },
       webRequestService: { listen: jest.fn() },
@@ -15,12 +16,11 @@ describe("BackgroundScript", () => {
       internalCommunicationService: { listenToContentScriptConnection: jest.fn() },
       popupCommunicationService: { listen: jest.fn() },
       webSocketService: { listen: jest.fn() },
-    };
-    (global as any).window = { providers };
+    } as any;
+    jest.spyOn(initProviders, "initProviders").mockImplementation(() => providers);
 
-    require("./background-script");
+    await import("./background-script");
 
-    expect(init).toHaveBeenCalled();
     expect(providers.webRequestService.listen).toHaveBeenCalled();
     expect(providers.tabControllerService.listen).toHaveBeenCalled();
     expect(providers.bootstrapService.listen).toHaveBeenCalled();
@@ -30,6 +30,8 @@ describe("BackgroundScript", () => {
   });
 
   test("extensionStateService.isChrome === false", async () => {
+    const initProviders = await import("./init-providers");
+
     const providers = {
       extensionStateService: { isChrome: false },
       webRequestService: { listen: jest.fn() },
@@ -38,12 +40,11 @@ describe("BackgroundScript", () => {
       internalCommunicationService: { listenToContentScriptConnection: jest.fn() },
       popupCommunicationService: { listen: jest.fn() },
       webSocketService: { listen: jest.fn() },
-    };
-    (global as any).window = { providers };
+    } as any;
+    jest.spyOn(initProviders, "initProviders").mockImplementation(() => providers);
 
-    require("./background-script");
+    await import("./background-script");
 
-    expect(init).toHaveBeenCalled();
     expect(providers.webRequestService.listen).not.toHaveBeenCalled();
     expect(providers.tabControllerService.listen).toHaveBeenCalled();
     expect(providers.bootstrapService.listen).toHaveBeenCalled();
