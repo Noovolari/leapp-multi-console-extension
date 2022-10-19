@@ -1,9 +1,6 @@
-import init from "./init";
-import { Providers } from "./models/providers";
+import initProviders from "./initProviders";
 
-init();
-
-const providers: Providers = (window as any).providers;
+const providers = initProviders();
 
 if (providers.extensionStateService.isChrome) {
   providers.webRequestService.listen();

@@ -9,7 +9,7 @@ import { ExtractSessionIdService } from "./services/extract-session-id.service";
 import { PopupCommunicationService } from "./services/popup-communication.service";
 import { Providers } from "./models/providers";
 
-export default function init(): void {
+export default function initProviders(): Providers {
   const providers = {} as Providers;
   providers.extensionStateService = new ExtensionStateService(navigator);
 
@@ -30,5 +30,5 @@ export default function init(): void {
 
   providers.popupCommunicationService = new PopupCommunicationService(chrome, providers.extensionStateService);
 
-  (window as any).providers = providers;
+  return providers;
 }
