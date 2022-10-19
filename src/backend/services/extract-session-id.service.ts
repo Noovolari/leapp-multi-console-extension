@@ -11,10 +11,8 @@ export class ExtractSessionIdService {
 
       port.onMessage.addListener((message) => {
         console.log(message);
-        if (message.request === sessionIdResponse) {
-          if (message.content) {
-            this.state.sessionToken = message.content;
-          }
+        if (message.request === sessionIdResponse && message.content) {
+          this.state.sessionToken = message.content;
         }
       });
 
