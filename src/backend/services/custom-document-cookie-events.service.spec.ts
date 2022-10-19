@@ -118,4 +118,65 @@ describe("CustomDocumentCookieEventsService", () => {
     service.customSetCookieEventHandler({ detail: " fake-cookie " });
     expect(document.cookie).toBe("sessionTokenfake-cookie");
   });
+
+  test("getCookiesString, empty initial cookie string", () => {
+    document.cookie = "";
+    const cookiesString = service.getCookiesString();
+    expect(cookiesString).toBe("");
+  });
+
+  test("getCookiesString, no sessionToken", () => {
+    state.sessionToken = undefined;
+    document.cookie = "cookie1; ##LEAPP##cookie2; cookie3";
+    const cookiesString = service.getCookiesString();
+    expect(cookiesString).toBe("cookie1; cookie3");
+  });
+
+  test("getCookiesString, with sessionToken", () => {
+    state.sessionToken = "token";
+    document.cookie = "cookie1; ##LEAPP##cookie2; tokencookie3";
+    const cookiesString = service.getCookiesString();
+    expect(cookiesString).toBe("cookie3");
+  });
+
+  test("customGetCookieEventHandler, with localStorage", () => {
+    localStorage.setItem = jest.fn();
+    service.getCookiesString = () => "cookies-string";
+
+    service.customGetCookieEventHandler();
+
+    expect(localStorage.setItem).toHaveBeenCalledWith("##SESSION-COOKIES##", "cookies-string");
+  });
+
+  test("customGetCookieEventHandler, without localStorage, with cookies-element", () => {
+    service.getCookiesString = () => "cookies-string";
+    localStorage.setItem = () => {
+      throw new Error("local storage not available");
+    };
+    const cookiesElement = {};
+    document.getElementById = jest.fn(() => cookiesElement);
+
+    service.customGetCookieEventHandler();
+
+    expect(document.getElementById).toHaveBeenCalledWith("##SESSION-COOKIES##");
+    expect(cookiesElement).toEqual({ a: "cookies-string" });
+  });
+
+  test("customGetCookieEventHandler, without localStorage, cookies-element not found", () => {
+    service.getCookiesString = () => "cookies-string";
+    localStorage.setItem = () => {
+      throw new Error("local storage not available");
+    };
+    const cookiesElement = { setAttribute: jest.fn(), style: {} };
+    document.getElementById = () => null;
+    document.createElement = jest.fn(() => cookiesElement);
+    document.documentElement = { appendChild: jest.fn() };
+
+    service.customGetCookieEventHandler();
+
+    expect(document.createElement).toHaveBeenCalledWith("div");
+    expect(cookiesElement.setAttribute).toHaveBeenCalledWith("id", "##SESSION-COOKIES##");
+    expect(document.documentElement.appendChild).toHaveBeenCalledWith(cookiesElement);
+    expect(cookiesElement).toMatchObject({ a: "cookies-string", style: { display: "none" } });
+  });
 });

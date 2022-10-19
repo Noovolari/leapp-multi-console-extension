@@ -1,12 +1,5 @@
-import {
-  getCustomCookieEventString,
-  leappToken,
-  newCookieSeparator,
-  sessionsCookiesLocalStorageSelector,
-  setCustomCookieEventString,
-} from "../models/constants";
-import { ExtensionStateService } from "./extension-state.service";
 import * as constants from "../models/constants";
+import { ExtensionStateService } from "./extension-state.service";
 
 export class CustomDocumentCookieEventsService {
   constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private state: ExtensionStateService) {}
@@ -14,8 +7,8 @@ export class CustomDocumentCookieEventsService {
   listen(): void {
     const injectableScript = this.generateCookieSetterGetterOverwriteScript();
     this.injectScriptInDocument(injectableScript);
-    this.injectedDocument.addEventListener(setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
-    this.injectedDocument.addEventListener(getCustomCookieEventString, () => this.customGetCookieEventHandler());
+    this.injectedDocument.addEventListener(constants.setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
+    this.injectedDocument.addEventListener(constants.getCustomCookieEventString, () => this.customGetCookieEventHandler());
   }
 
   private injectScriptInDocument(injectableScript: string) {
@@ -65,45 +58,43 @@ export class CustomDocumentCookieEventsService {
     }
   }
 
-  private customGetCookieEventHandler(): void {
-    let newCookies = "";
-    const cookiesString = this.injectedDocument.cookie;
-    const cookiesArray: string[] = [];
-
-    if (cookiesString) {
-      cookiesArray.push(...cookiesString.split("; "));
-
-      for (const index in cookiesArray) {
-        if (this.state.sessionToken) {
-          // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
-          if (cookiesArray[index].substring(0, this.state.sessionToken.length) !== this.state.sessionToken) {
-            continue;
-          }
-        } else {
-          // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
-          if (cookiesArray[index].startsWith(leappToken)) {
-            continue;
-          }
+  private getCookiesString(): string {
+    const initialCookiesString = this.injectedDocument.cookie;
+    if (!initialCookiesString) {
+      return "";
+    }
+    const cookies: string[] = [...initialCookiesString.split(constants.cookiesStringSeparator)];
+    const cookiesToReturn: string[] = [];
+    for (const cookie of cookies) {
+      if (this.state.sessionToken) {
+        // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
+        if (cookie.startsWith(this.state.sessionToken)) {
+          cookiesToReturn.push(cookie.substring(this.state.sessionToken.length));
         }
-
-        if (newCookies) {
-          newCookies += newCookieSeparator;
+      } else {
+        // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
+        if (!cookie.startsWith(constants.leappToken)) {
+          cookiesToReturn.push(cookie);
         }
-
-        newCookies += this.state.sessionToken ? cookiesArray[index].substring(this.state.sessionToken.length) : cookiesArray[index];
       }
     }
+    return cookiesToReturn.join(constants.cookiesStringSeparator);
+  }
 
+  private customGetCookieEventHandler(): void {
+    const cookiesString = this.getCookiesString();
     try {
-      this.injectedLocalStorage.setItem(sessionsCookiesLocalStorageSelector, newCookies);
+      this.injectedLocalStorage.setItem(constants.sessionsCookiesLocalStorageSelector, cookiesString);
     } catch (err) {
-      if (!this.injectedDocument.getElementById(sessionsCookiesLocalStorageSelector)) {
-        const index = this.injectedDocument.createElement("div");
-        index.setAttribute("id", sessionsCookiesLocalStorageSelector);
-        this.injectedDocument.documentElement.appendChild(index);
-        index.style.display = "none";
+      let cookiesElement = this.injectedDocument.getElementById(constants.sessionsCookiesLocalStorageSelector);
+      if (!cookiesElement) {
+        cookiesElement = this.injectedDocument.createElement("div");
+        cookiesElement.setAttribute("id", constants.sessionsCookiesLocalStorageSelector);
+        this.injectedDocument.documentElement.appendChild(cookiesElement);
+        cookiesElement.style.display = "none";
       }
-      (this.injectedDocument.getElementById(sessionsCookiesLocalStorageSelector) as any).a = newCookies;
+      (cookiesElement as any).a = cookiesString;
+      // TODO: why .a and not .innerText???
     }
   }
 }

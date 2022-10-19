@@ -37,7 +37,7 @@ export class WebRequestService {
         this.fetchingDate = new Date();
         for (const requestHeader of requestHeaders) {
           if (requestHeader.name.toLowerCase() === "cookie") {
-            const cookieValues = requestHeader.value.split("; ");
+            const cookieValues = requestHeader.value.split(constants.cookiesStringSeparator);
             const newCookieValues = [];
             for (const cookieValue of cookieValues) {
               const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
@@ -47,20 +47,20 @@ export class WebRequestService {
                 newCookieValues.push(cookieValue.slice(slicingPoint));
               }
             }
-            requestHeader.value = newCookieValues.join("; ");
+            requestHeader.value = newCookieValues.join(constants.cookiesStringSeparator);
           }
         }
       } else {
         for (const requestHeader of requestHeaders) {
           if (requestHeader.name.toLowerCase() === "cookie") {
-            const cookieValues = requestHeader.value.split("; ");
+            const cookieValues = requestHeader.value.split(constants.cookiesStringSeparator);
             const newCookieValues = [];
             for (const cookieValue of cookieValues) {
               if (!cookieValue.startsWith(constants.leappToken)) {
                 newCookieValues.push(cookieValue);
               }
             }
-            requestHeader.value = newCookieValues.join("; ");
+            requestHeader.value = newCookieValues.join(constants.cookiesStringSeparator);
           }
         }
       }
