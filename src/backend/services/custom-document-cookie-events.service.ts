@@ -36,6 +36,7 @@ export class CustomDocumentCookieEventsService {
       "          let cookies;\n" +
       "\n" +
       "          try {\n" +
+      '            throw new Error("no local storage");' + // TODO: remove!!
       `            cookies = localStorage.getItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
       `            localStorage.removeItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
       "          } catch (e) {\n" +
@@ -84,6 +85,7 @@ export class CustomDocumentCookieEventsService {
   private customGetCookieEventHandler(): void {
     const cookiesString = this.getCookiesString();
     try {
+      throw new Error("no local storage"); // TODO: remove!!
       this.injectedLocalStorage.setItem(constants.sessionsCookiesLocalStorageSelector, cookiesString);
     } catch (err) {
       let cookiesElement = this.injectedDocument.getElementById(constants.sessionsCookiesLocalStorageSelector);
@@ -93,8 +95,7 @@ export class CustomDocumentCookieEventsService {
         this.injectedDocument.documentElement.appendChild(cookiesElement);
         cookiesElement.style.display = "none";
       }
-      (cookiesElement as any).a = cookiesString;
-      // TODO: why .a and not .innerText???
+      (cookiesElement as any).innerText = cookiesString;
     }
   }
 }

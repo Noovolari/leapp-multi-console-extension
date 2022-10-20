@@ -3,19 +3,21 @@
 require("./popup.css");
 
 (function () {
-  const sessions = [];
   chrome.runtime.connect({name: "background-connection"});
   chrome.runtime.sendMessage(
     {type: "session-list-request"},
     (response) => {
+      const sessions = [[]];
       const containerElement = document.getElementById("container");
       const sessionList = JSON.parse(response);
-      sessions.push([]);
-      const tabsListSum = sessionList.filter((session) => session.data).map((response) => response.tabsList.length).reduce((prev, curr) => prev + curr, 0);
+      const tabsListSum = sessionList
+        .filter((session) => session.data)
+        .map((session) => session.tabsList.length)
+        .reduce((prev, curr) => prev + curr, 0);
       if (tabsListSum === 0) {
-        containerElement.innerHTML += `<p class="first-launch">Start by opening a session from Leapp</p>`
+        containerElement.innerHTML += '<p class="first-launch">Start by opening a session from Leapp</p>'
       } else {
-        sessionList.forEach((session, sessionId) => {
+        for (const [sessionId, session] of sessionList.entries()) {
           if (session.data) {
             sessions.push(session.tabsList);
             if (session.tabsList.length > 0) {
@@ -36,18 +38,18 @@ require("./popup.css");
               </div>`
             }
           }
-        })
-      }
-      const elements = document.querySelectorAll('.row');
-      elements.forEach(el => {
-        el.addEventListener("click", function handleClick(event) {
-          event.stopPropagation();
-          const sessionId = this.getAttribute("data-session-id");
-          const tabId = sessions[sessionId][0];
-          chrome.runtime.sendMessage({type: "focus-tab", tabId: tabId}, () => {
-          })
+        }
+        const elements = document.querySelectorAll('.row');
+        elements.forEach(el => {
+          el.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const sessionId = el.getAttribute("data-session-id");
+            const tabId = sessions[sessionId][0];
+            chrome.runtime.sendMessage({type: "focus-tab", tabId: tabId}, () => {
+            })
+          });
         });
-      });
+      }
     }
   );
 })();

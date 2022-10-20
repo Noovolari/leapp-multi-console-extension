@@ -59,9 +59,20 @@ module.exports = (env, argv) => ({
     // Copy static assets from `public` folder to `build` folder
     new CopyWebpackPlugin({
       patterns: [
-        { from: "./manifest.json" },
-        { from: "**/*", context: "asset" },
-        { from: "**/*", context: "src/frontend"},
+        {
+          from: "./manifest.json"
+        },
+        {
+          from: "**/*",
+          context: "asset"
+        },
+        {
+          from: "**/*",
+          context: "src/frontend",
+          globOptions: {
+            ignore: ["**/*.spec.*"],
+          },
+        },
       ],
     }),
     // Extract CSS into separate files
