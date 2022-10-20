@@ -4,21 +4,21 @@ require("./popup.css");
 
 (function () {
   const sessions = [];
-  chrome.runtime.connect({ name: "background-connection" });
+  chrome.runtime.connect({name: "background-connection"});
   chrome.runtime.sendMessage(
-    { type: "session-list-request" },
+    {type: "session-list-request"},
     (response) => {
       const containerElement = document.getElementById("container");
       const sessionList = JSON.parse(response);
       sessions.push([]);
       const tabsListSum = sessionList.filter((session) => session.data).map((response) => response.tabsList.length).reduce((prev, curr) => prev + curr, 0);
-      if(tabsListSum === 0) {
+      if (tabsListSum === 0) {
         containerElement.innerHTML += `<p class="first-launch">Start by opening a session from Leapp</p>`
       } else {
         sessionList.forEach((session, sessionId) => {
-          if(session.data) {
+          if (session.data) {
             sessions.push(session.tabsList);
-            if(session.tabsList.length > 0){
+            if (session.tabsList.length > 0) {
               const sessionName = session.data.sessionName;
               const sessionRole = session.data.sessionRole;
               const sessionRegion = session.data.sessionRegion;
@@ -44,7 +44,8 @@ require("./popup.css");
           event.stopPropagation();
           const sessionId = this.getAttribute("data-session-id");
           const tabId = sessions[sessionId][0];
-          chrome.runtime.sendMessage({ type: "focus-tab", tabId: tabId }, () => {})
+          chrome.runtime.sendMessage({type: "focus-tab", tabId: tabId}, () => {
+          })
         });
       });
     }

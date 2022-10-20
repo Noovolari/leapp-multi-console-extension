@@ -1,4 +1,4 @@
-import { jest } from "@jest/globals";
+import { jest, describe, afterEach, test, expect } from "@jest/globals";
 
 describe("ContentScript", () => {
   afterEach(() => {
