@@ -24,7 +24,7 @@ export function initProviders(): Providers {
 
   providers.internalCommunicationService = new InternalCommunicationService(chrome.runtime, providers.extensionStateService);
 
-  providers.webSocketService = new WebsocketService(providers.tabControllerService, providers.webRequestService, WebSocket);
+  providers.webSocketService = new WebsocketService(providers.tabControllerService, WebSocket, providers.webRequestService);
 
   providers.extractSessionIdService = new ExtractSessionIdService(providers.internalCommunicationService, providers.extensionStateService);
 

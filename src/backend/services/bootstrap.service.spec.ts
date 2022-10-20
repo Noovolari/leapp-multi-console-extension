@@ -20,6 +20,9 @@ describe("BootstrapService", () => {
       domain: "fake-domain-2",
       path: "fake-path-2",
     },
+    {
+      name: "fake-name-3",
+    },
   ];
 
   beforeEach(() => {

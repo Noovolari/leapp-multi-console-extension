@@ -8,8 +8,8 @@ export class WebsocketService {
 
   constructor(
     private tabControllerService: TabControllerService,
-    private webRequestService: WebRequestService,
     private webSocketClass: typeof WebSocket,
+    private webRequestService?: WebRequestService,
     public port: number = 8095,
     public interval: number = 6000
   ) {
@@ -35,7 +35,8 @@ export class WebsocketService {
             this.tabControllerService.openNewSessionTab(payload);
             this.ws.send(JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
           } else if (message.type === "get-fetching-state") {
-            this.ws.send(JSON.stringify({ type: "send-fetching-state", fetching: this.webRequestService.fetching }));
+            const fetchingState = this.webRequestService?.fetching ?? false;
+            this.ws.send(JSON.stringify({ type: "send-fetching-state", fetching: fetchingState }));
           }
         };
 

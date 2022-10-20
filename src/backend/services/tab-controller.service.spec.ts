@@ -33,6 +33,12 @@ describe("TabControllerService", () => {
     service = new TabControllerService(chromeNamespace, state);
   });
 
+  test("getBrowser", () => {
+    (global as any).browser = "browser";
+    const browser = service.getBrowser();
+    expect(browser).toBe("browser");
+  });
+
   test("openNewSessionTab, isChrome returns true", () => {
     const leappPayload: any = { fakeKey: "fake-value", url: "fake-url" };
     state.isChrome = true;
