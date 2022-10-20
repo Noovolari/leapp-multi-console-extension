@@ -1,6 +1,6 @@
 import { TabControllerService } from "./tab-controller.service";
 import { LeappSessionInfo } from "../models/leapp-session-info";
-import { WebRequestService } from "./web-request.service";
+import { FetchingState, WebRequestService } from "./web-request.service";
 
 export class WebsocketService {
   private connected;
@@ -35,7 +35,7 @@ export class WebsocketService {
             this.tabControllerService.openNewSessionTab(payload);
             this.ws.send(JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
           } else if (message.type === "get-fetching-state") {
-            const fetchingState = this.webRequestService?.fetching ?? false;
+            const fetchingState = this.webRequestService?.fetching ?? FetchingState.notFetching;
             this.ws.send(JSON.stringify({ type: "send-fetching-state", fetching: fetchingState }));
           }
         };

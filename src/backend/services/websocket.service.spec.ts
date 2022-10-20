@@ -1,4 +1,5 @@
 import { WebsocketService } from "./websocket.service";
+import { FetchingState } from "./web-request.service";
 
 describe("WebsocketService", () => {
   let tabControllerService: any;
@@ -119,7 +120,7 @@ describe("WebsocketService", () => {
       expect(service.ws.send).toHaveBeenNthCalledWith(1, JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
 
       service.ws.onmessage({ data: '{"type":"get-fetching-state"}' });
-      expect(service.ws.send).toHaveBeenNthCalledWith(2, JSON.stringify({ type: "send-fetching-state", fetching: false }));
+      expect(service.ws.send).toHaveBeenNthCalledWith(2, JSON.stringify({ type: "send-fetching-state", fetching: FetchingState.notFetching }));
 
       service.ws.onclose();
       expect(service.connected).toBe(false);

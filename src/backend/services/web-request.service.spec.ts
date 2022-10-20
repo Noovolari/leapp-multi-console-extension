@@ -1,5 +1,5 @@
 import { describe, beforeEach, afterAll, test, jest, expect } from "@jest/globals";
-import { WebRequestService } from "./web-request.service";
+import { FetchingState, WebRequestService } from "./web-request.service";
 
 describe("WebRequestService", () => {
   let service: any;
@@ -21,7 +21,7 @@ describe("WebRequestService", () => {
     jest.setSystemTime(new Date(2022, 1, 1, 0, 0, 0, 899));
     service.fetchingDate = new Date(2022, 1, 1, 0, 0, 0, 0);
 
-    expect(service.fetching).toBe(true);
+    expect(service.fetching).toBe(FetchingState.fetching);
   });
 
   test("fetching, is not fetching", () => {
@@ -29,7 +29,7 @@ describe("WebRequestService", () => {
     jest.setSystemTime(new Date(2022, 1, 1, 0, 0, 0, 900));
     service.fetchingDate = new Date(2022, 1, 1, 0, 0, 0, 0);
 
-    expect(service.fetching).toBe(false);
+    expect(service.fetching).toBe(FetchingState.notFetching);
   });
 
   test("", () => {

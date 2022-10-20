@@ -3,6 +3,12 @@ import * as constants from "../models/constants";
 
 const awsConsoleUrls = ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"];
 
+export enum FetchingState {
+  notFetching,
+  fetchingRequested,
+  fetching,
+}
+
 export class WebRequestService {
   private fetchingDate;
 
@@ -10,8 +16,9 @@ export class WebRequestService {
     this.fetchingDate = new Date(0);
   }
 
-  get fetching(): boolean {
-    return new Date().getTime() - this.fetchingDate.getTime() < constants.fetchingThreshold;
+  get fetching(): FetchingState {
+    const thresholdExpired = !(new Date().getTime() - this.fetchingDate.getTime() < constants.fetchingThreshold);
+    return thresholdExpired ? FetchingState.notFetching : FetchingState.fetching;
   }
 
   listen(): void {
