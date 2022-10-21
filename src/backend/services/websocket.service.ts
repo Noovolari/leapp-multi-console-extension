@@ -11,7 +11,7 @@ export class WebsocketService {
     private webSocketClass: typeof WebSocket,
     private webRequestService?: WebRequestService,
     public port: number = 8095,
-    public interval: number = 6000
+    public interval: number = 2000
   ) {
     this.connected = false;
     this.ws = null;

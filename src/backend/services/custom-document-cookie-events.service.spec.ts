@@ -159,7 +159,7 @@ describe("CustomDocumentCookieEventsService", () => {
     service.customGetCookieEventHandler();
 
     expect(document.getElementById).toHaveBeenCalledWith("##SESSION-COOKIES##");
-    expect(cookiesElement).toEqual({ a: "cookies-string" });
+    expect(cookiesElement).toEqual({ innerText: "cookies-string" });
   });
 
   test("customGetCookieEventHandler, without localStorage, cookies-element not found", () => {
@@ -177,6 +177,6 @@ describe("CustomDocumentCookieEventsService", () => {
     expect(document.createElement).toHaveBeenCalledWith("div");
     expect(cookiesElement.setAttribute).toHaveBeenCalledWith("id", "##SESSION-COOKIES##");
     expect(document.documentElement.appendChild).toHaveBeenCalledWith(cookiesElement);
-    expect(cookiesElement).toMatchObject({ a: "cookies-string", style: { display: "none" } });
+    expect(cookiesElement).toMatchObject({ innerText: "cookies-string", style: { display: "none" } });
   });
 });

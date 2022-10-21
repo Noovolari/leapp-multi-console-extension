@@ -42,7 +42,7 @@ describe("WebsocketService", () => {
 
       service.listen();
 
-      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 6000);
+      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
       expect(console.log).toHaveBeenNthCalledWith(1, "checking if connected");
     } finally {
       (setInterval as any) = realSetInterval;
@@ -58,7 +58,7 @@ describe("WebsocketService", () => {
 
       service.listen();
 
-      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 6000);
+      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
       expect(console.log).toHaveBeenNthCalledWith(1, "checking if connected");
       expect(service.createWebsocket).toHaveBeenCalledWith(8095);
       expect(service.ws.onopen).toStrictEqual(expect.any(Function));
@@ -103,7 +103,7 @@ describe("WebsocketService", () => {
 
       service.listen();
 
-      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 6000);
+      expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
       expect(console.log).toHaveBeenNthCalledWith(1, "checking if connected");
       expect(service.createWebsocket).toHaveBeenCalledWith(8095);
       expect(service.ws.onopen).toStrictEqual(expect.any(Function));

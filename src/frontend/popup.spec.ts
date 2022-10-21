@@ -9,6 +9,9 @@ describe("popup", () => {
 
   beforeEach(async () => {
     jest.mock("./popup.css", () => {});
+    jest.mock("./concat.js", () => (html: any, concatElement: any) => {
+      concatElement.innerHTML += html;
+    });
 
     globalNamespace = global as any;
     globalNamespace.chrome = {

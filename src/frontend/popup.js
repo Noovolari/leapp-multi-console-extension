@@ -1,6 +1,7 @@
 "use strict";
 
 require("./popup.css");
+const concatHTML = require("./concat.js");
 
 (function () {
   chrome.runtime.connect({name: "background-connection"});
@@ -15,7 +16,7 @@ require("./popup.css");
         .map((session) => session.tabsList.length)
         .reduce((prev, curr) => prev + curr, 0);
       if (tabsListSum === 0) {
-        containerElement.innerHTML += '<p class="first-launch">Start by opening a session from Leapp</p>'
+        concatHTML('<p class="first-launch">Start by opening a session from Leapp</p>', containerElement);
       } else {
         for (const [sessionId, session] of sessionList.entries()) {
           if (session.data) {
@@ -25,8 +26,7 @@ require("./popup.css");
               const sessionRole = session.data.sessionRole;
               const sessionRegion = session.data.sessionRegion;
               const sessionType = session.data.sessionType;
-              containerElement.innerHTML +=
-                `<div class="row" data-session-id="${sessionId}">
+              const rowHtml = `<div class="row" data-session-id="${sessionId}">
                 <img src="icons/${sessionType}.png" alt="provider-icon">
                 <div class="session-info-container">
                     <p class="session-name">Name: ${sessionName}</p>
@@ -35,7 +35,8 @@ require("./popup.css");
                 <div class="badge-container">
                     <span class="badge badge-gray badge-region">${sessionRegion}</span>
                 </div>
-              </div>`
+              </div>`;
+              concatHTML(rowHtml, containerElement);
             }
           }
         }
