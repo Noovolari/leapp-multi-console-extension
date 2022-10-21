@@ -24,7 +24,6 @@
   "permissions": [
     "contextualIdentities",
     "contextMenus",
-    "nativeMessaging",
     "tabs",
     "cookies",
     "storage",
@@ -43,5 +42,10 @@
       "run_at": "document_start",
       "js": [ "content-script.js" ]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "leapp@extension.com"
+    }
+  }
 }
