@@ -21,6 +21,7 @@ export class WebsocketService {
     setInterval(() => {
       console.log("checking if connected");
       if (!this.connected) {
+        this.ws?.close();
         this.ws = this.createWebsocket(this.port);
 
         this.ws.onopen = (_) => {

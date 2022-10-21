@@ -104,6 +104,8 @@ span.badge-region {
   font-weight: 500;
   background-color: #999999 !important;
   color: #ffffff !important;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .badge-container {
