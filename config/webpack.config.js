@@ -67,11 +67,8 @@ module.exports = (env, argv) => ({
           context: "asset"
         },
         {
-          from: "**/*",
+          from: "**/*.html",
           context: "src/frontend",
-          globOptions: {
-            ignore: ["**/*.spec.*"],
-          },
         },
       ],
     }),
