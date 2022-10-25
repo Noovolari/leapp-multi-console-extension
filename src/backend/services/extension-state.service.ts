@@ -1,5 +1,6 @@
 import { LeappSessionInfo } from "../models/leapp-session-info";
 import { IsolatedSession } from "../models/isolated-session";
+import * as constants from "../models/constants";
 
 export class ExtensionStateService {
   private readonly userAgent: string;
@@ -68,5 +69,29 @@ export class ExtensionStateService {
     const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
     isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
     delete this.hashedSessions[tabIdToRemove];
+  }
+
+  setCookieItemInLocalStorage(cookieString, sessionTokenId) {
+    const cookieArray = localStorage.getItem(sessionTokenId) ? localStorage.getItem(sessionTokenId).split(constants.cookiesStringSeparator) : [];
+    const cookieArrayNew = cookieString.split(constants.cookiesStringSeparator);
+    const map = new Map();
+    for (const cookie of cookieArray) {
+      const cookieParts = cookie.split("=");
+      const cookieName = cookieParts[0];
+      const cookieValue = cookieParts[1];
+      map.set(cookieName, cookieValue);
+    }
+    for (const cookie of cookieArrayNew) {
+      const cookieParts = cookie.split("=");
+      const cookieName = cookieParts[0];
+      const cookieValue = cookieParts[1];
+      map.set(cookieName, cookieValue);
+    }
+    const resultCookies = [];
+    for (const entry of map.keys()) {
+      const res = map.get(entry);
+      resultCookies.push(res !== undefined ? `${entry}=${res}` : entry);
+    }
+    localStorage.setItem(sessionTokenId, resultCookies.join(constants.cookiesStringSeparator));
   }
 }

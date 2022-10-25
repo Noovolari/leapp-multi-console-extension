@@ -37,7 +37,6 @@ export class WebRequestService {
 
   private onBeforeSendHeadersCallback(data: any) {
     const tabId = data.tabId;
-    let blocked = false;
     if (tabId > 0) {
       const tabSessionId = this.state.getSessionIdByTabId(tabId);
       const requestHeaders = data.requestHeaders;
@@ -45,27 +44,9 @@ export class WebRequestService {
         this.fetchingDate = new Date();
         for (const requestHeader of requestHeaders) {
           if (requestHeader.name.toLowerCase() === "cookie") {
-            while (blocked) {
-              console.log("waiting...");
-            }
-            blocked = true;
             const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-            chrome.storage.sync.get(sessionString, (value) => {
-              //console.log(value);
-              // const cookieValues = requestHeader.value.split(constants.cookiesStringSeparator);
-              // const newCookieValues = [];
-              // for (const cookieValue of cookieValues) {
-              //   const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-              //   if (cookieValue.startsWith(sessionString)) {
-              //     const slicingPoint =
-              //       cookieValue.indexOf(constants.separatorToken, `${constants.leappToken}`.length) + `${constants.separatorToken}`.length;
-              //     newCookieValues.push(cookieValue.slice(slicingPoint));
-              //   }
-              // }
-              console.log("getting from webrequest");
-              requestHeader.value = value;
-              blocked = false;
-            });
+            console.log("getting from webrequest");
+            requestHeader.value = localStorage.getItem(sessionString);
           }
         }
       } else {
@@ -97,9 +78,7 @@ export class WebRequestService {
           if (responseHeader.name.toLowerCase() === "set-cookie") {
             const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
             //responseHeader.value = sessionString + responseHeader.value;
-            const newStorageObject = {};
-            newStorageObject[sessionString] = responseHeader.value;
-            chrome.storage.sync.set(newStorageObject);
+            this.state.setCookieItemInLocalStorage(responseHeader.value, sessionString);
             console.log("setting from background");
           }
         }
