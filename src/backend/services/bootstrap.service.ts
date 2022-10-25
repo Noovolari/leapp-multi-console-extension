@@ -22,5 +22,6 @@ export class BootstrapService {
         });
       });
     };
+    chrome.runtime.setUninstallURL("https://google.com");
   }
 }

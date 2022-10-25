@@ -54,23 +54,39 @@ export class CustomDocumentCookieEventsService {
     if (this.state.sessionToken === null || this.state.sessionToken === "" || this.state.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;
     } else {
-      this.injectedDocument.cookie = this.state.sessionToken + cookie.trim();
+      const newStorageObject = {};
+      newStorageObject[this.state.sessionToken] = cookie.trim();
+      chrome.storage.sync.set(newStorageObject);
+      //this.injectedDocument.cookie = chrome.storage.sync.set()//this.state.sessionToken + cookie.trim();
     }
   }
 
   private getCookiesString(): string {
     const initialCookiesString = this.injectedDocument.cookie;
+    let blocked = false;
     if (!initialCookiesString) {
       return "";
     }
     const cookies: string[] = [...initialCookiesString.split(constants.cookiesStringSeparator)];
     const cookiesToReturn: string[] = [];
     for (const cookie of cookies) {
+      while (blocked) {
+        console.log("waiting...");
+      }
       if (this.state.sessionToken) {
         // A session that is already managed by the extension: the cookies are prefixed with the Leapp Custom Prefix
-        if (cookie.startsWith(this.state.sessionToken)) {
-          cookiesToReturn.push(cookie.substring(this.state.sessionToken.length));
-        }
+        // if (cookie.startsWith(this.state.sessionToken)) {
+        //   cookiesToReturn.push(cookie.substring(this.state.sessionToken.length));
+        // }
+        blocked = true;
+        console.log(this.state.sessionToken);
+        chrome.storage.sync.get(this.state.sessionToken, (value) => {
+          console.log("value is: ");
+          console.log(value);
+          const actualValue = Object.values(value);
+          cookiesToReturn.push(...actualValue);
+          blocked = false;
+        });
       } else {
         // A session not managed by Leapp Extension: the cookies are still (or renamed to) their normal name
         if (!cookie.startsWith(constants.leappToken)) {

@@ -37,6 +37,7 @@ export class WebRequestService {
 
   private onBeforeSendHeadersCallback(data: any) {
     const tabId = data.tabId;
+    let blocked = false;
     if (tabId > 0) {
       const tabSessionId = this.state.getSessionIdByTabId(tabId);
       const requestHeaders = data.requestHeaders;
@@ -44,17 +45,27 @@ export class WebRequestService {
         this.fetchingDate = new Date();
         for (const requestHeader of requestHeaders) {
           if (requestHeader.name.toLowerCase() === "cookie") {
-            const cookieValues = requestHeader.value.split(constants.cookiesStringSeparator);
-            const newCookieValues = [];
-            for (const cookieValue of cookieValues) {
-              const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-              if (cookieValue.startsWith(sessionString)) {
-                const slicingPoint =
-                  cookieValue.indexOf(constants.separatorToken, `${constants.leappToken}`.length) + `${constants.separatorToken}`.length;
-                newCookieValues.push(cookieValue.slice(slicingPoint));
-              }
+            while (blocked) {
+              console.log("waiting...");
             }
-            requestHeader.value = newCookieValues.join(constants.cookiesStringSeparator);
+            blocked = true;
+            const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
+            chrome.storage.sync.get(sessionString, (value) => {
+              //console.log(value);
+              // const cookieValues = requestHeader.value.split(constants.cookiesStringSeparator);
+              // const newCookieValues = [];
+              // for (const cookieValue of cookieValues) {
+              //   const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
+              //   if (cookieValue.startsWith(sessionString)) {
+              //     const slicingPoint =
+              //       cookieValue.indexOf(constants.separatorToken, `${constants.leappToken}`.length) + `${constants.separatorToken}`.length;
+              //     newCookieValues.push(cookieValue.slice(slicingPoint));
+              //   }
+              // }
+              console.log("getting from webrequest");
+              requestHeader.value = value;
+              blocked = false;
+            });
           }
         }
       } else {
@@ -85,7 +96,11 @@ export class WebRequestService {
         for (const responseHeader of responseHeaders) {
           if (responseHeader.name.toLowerCase() === "set-cookie") {
             const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
-            responseHeader.value = sessionString + responseHeader.value;
+            //responseHeader.value = sessionString + responseHeader.value;
+            const newStorageObject = {};
+            newStorageObject[sessionString] = responseHeader.value;
+            chrome.storage.sync.set(newStorageObject);
+            console.log("setting from background");
           }
         }
         return { responseHeaders };
