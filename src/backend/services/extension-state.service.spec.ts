@@ -5,11 +5,11 @@ describe("ExtensionStateService", () => {
   let service: any;
 
   beforeEach(() => {
-    service = new ExtensionStateService({} as any);
+    service = new ExtensionStateService({} as any, {} as any);
   });
 
   test("constructor", () => {
-    const service = new ExtensionStateService({ userAgent: "user-agent" } as any) as any;
+    const service = new ExtensionStateService({ userAgent: "user-agent" } as any, {} as any) as any;
     expect(service.userAgent).toBe("user-agent");
   });
 

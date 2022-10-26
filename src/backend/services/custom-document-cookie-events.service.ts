@@ -34,14 +34,8 @@ export class CustomDocumentCookieEventsService {
       `          const event = new CustomEvent("${constants.getCustomCookieEventString}");\n` +
       "          document.dispatchEvent(event);\n" +
       "          let cookies;\n" +
-      "\n" +
-      "          try {\n" +
-      `            cookies = localStorage.getItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
-      `            localStorage.removeItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
-      "          } catch (e) {\n" +
-      `            cookies = document.getElementById("${constants.sessionsCookiesLocalStorageSelector}").innerText;\n` +
-      "          }\n" +
-      "\n" +
+      `          cookies = localStorage.getItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
+      `          localStorage.removeItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
       "          return cookies;\n" +
       "        }\n" +
       "      });\n" +
@@ -54,35 +48,17 @@ export class CustomDocumentCookieEventsService {
     if (this.state.sessionToken === null || this.state.sessionToken === "" || this.state.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;
     } else {
-      this.state.setCookieItemInLocalStorage(cookie.trim(), this.state.sessionToken);
-      // this.injectedDocument.cookie = this.state.sessionToken + cookie.trim();
-    }
-  }
-
-  private getCookiesString(): string {
-    const initialCookiesString = this.state.sessionToken ? localStorage.getItem(this.state.sessionToken) : this.injectedDocument.cookie;
-    console.log("ICS \n", initialCookiesString);
-    if (!initialCookiesString) {
-      return "";
-    } else {
-      return initialCookiesString;
+      const cookies = this.state.setSingleCookieState(cookie, this.state.sessionToken);
+      this.state.synchronizeCookies(cookies, this.state.sessionToken, "content-script");
     }
   }
 
   private customGetCookieEventHandler(): void {
-    console.log("GET EVENT");
     const cookiesString = this.getCookiesString();
-    try {
-      this.injectedLocalStorage.setItem(constants.sessionsCookiesLocalStorageSelector, cookiesString);
-    } catch (err) {
-      let cookiesElement = this.injectedDocument.getElementById(constants.sessionsCookiesLocalStorageSelector);
-      if (!cookiesElement) {
-        cookiesElement = this.injectedDocument.createElement("div");
-        cookiesElement.setAttribute("id", constants.sessionsCookiesLocalStorageSelector);
-        this.injectedDocument.documentElement.appendChild(cookiesElement);
-        cookiesElement.style.display = "none";
-      }
-      (cookiesElement as any).innerText = cookiesString;
-    }
+    this.injectedLocalStorage.setItem(constants.sessionsCookiesLocalStorageSelector, cookiesString);
+  }
+
+  private getCookiesString(): string {
+    return (this.state.sessionToken ? localStorage.getItem(this.state.sessionToken) : this.injectedDocument.cookie) ?? "";
   }
 }

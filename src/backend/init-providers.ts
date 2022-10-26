@@ -8,10 +8,16 @@ import { CustomDocumentCookieEventsService } from "./services/custom-document-co
 import { ExtractSessionIdService } from "./services/extract-session-id.service";
 import { PopupCommunicationService } from "./services/popup-communication.service";
 import { Providers } from "./models/providers";
+import { Cookie } from "./models/cookie";
 
 export function initProviders(): Providers {
+  // TODO: DON'T DO LIKE THIS, USE GETTERS!!!
   const providers = {} as Providers;
-  providers.extensionStateService = new ExtensionStateService(navigator);
+  const backgroundPort = chrome.runtime.connect({ name: "background-script-connection" });
+  const cookiesMap = new Map<string, Cookie>();
+  (window as any).cookiesMap = cookiesMap; // TODO: remove
+
+  providers.extensionStateService = new ExtensionStateService(navigator, backgroundPort, cookiesMap);
 
   if (providers.extensionStateService.isChrome) {
     providers.webRequestService = new WebRequestService(chrome.webRequest, providers.extensionStateService);
@@ -26,7 +32,7 @@ export function initProviders(): Providers {
 
   providers.webSocketService = new WebsocketService(providers.tabControllerService, WebSocket, providers.webRequestService);
 
-  providers.extractSessionIdService = new ExtractSessionIdService(providers.internalCommunicationService, providers.extensionStateService);
+  providers.extractSessionIdService = new ExtractSessionIdService(backgroundPort, providers.extensionStateService);
 
   providers.popupCommunicationService = new PopupCommunicationService(chrome, providers.extensionStateService);
 

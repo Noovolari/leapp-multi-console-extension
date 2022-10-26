@@ -2,11 +2,7 @@ import { ExtensionStateService } from "./extension-state.service";
 import * as constants from "../models/constants";
 
 export class InternalCommunicationService {
-  backgroundScriptConnectionName: string;
-
-  constructor(private chromeRuntime: typeof chrome.runtime, private state: ExtensionStateService) {
-    this.backgroundScriptConnectionName = "background-script-connection";
-  }
+  constructor(private chromeRuntime: typeof chrome.runtime, private state: ExtensionStateService) {}
 
   listenToContentScriptConnection(): void {
     this.chromeRuntime.onConnect.addListener((port: any) => {
@@ -16,13 +12,14 @@ export class InternalCommunicationService {
     });
   }
 
-  connectToBackgroundScript(): any {
-    return this.chromeRuntime.connect({ name: this.backgroundScriptConnectionName });
-  }
-
   private routeMessage(port: any, message: any) {
-    if (message.request == constants.sessionIdRequest) {
+    if (message.request === constants.sessionIdRequest) {
       this.handleGetSessionId(port);
+    } else if (message.request === "set-cookies-request") {
+      this.state.setSingleCookieState(message.cookies, message.sessionTokenId);
+      console.log("Receiving cookies from content script");
+      console.log(new Date().getTime());
+      console.log(message.cookies);
     }
   }
 

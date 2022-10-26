@@ -78,7 +78,8 @@ export class WebRequestService {
           if (responseHeader.name.toLowerCase() === "set-cookie") {
             const sessionString = `${constants.leappToken}${tabSessionId}${constants.separatorToken}`;
             //responseHeader.value = sessionString + responseHeader.value;
-            this.state.setCookieItemInLocalStorage(responseHeader.value, sessionString);
+            const cookies = this.state.setSingleCookieState(responseHeader.value, sessionString);
+            this.state.synchronizeCookies(cookies, sessionString, "background-script", tabId);
             console.log("setting from background");
           }
         }

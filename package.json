@@ -13,7 +13,7 @@
     "chrome-dev": "npm run build && cd build && web-ext run -t chromium",
     "firefox-dev": "npm run build && cd build && web-ext run -t firefox-desktop",
     "watch": "webpack --mode=development --watch --config config/webpack.config.js",
-    "build": "webpack --mode=production --config config/webpack.config.js",
+    "build": "webpack --mode=none --config config/webpack.config.js",
     "test": "npx jest",
     "test-coverage": "npx jest --coverage",
     "lint": "eslint .",

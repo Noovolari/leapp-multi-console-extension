@@ -1,6 +1,7 @@
 import { LeappSessionInfo } from "../models/leapp-session-info";
 import { IsolatedSession } from "../models/isolated-session";
 import * as constants from "../models/constants";
+import { CookiesMap } from "../models/cookie";
 
 export class ExtensionStateService {
   private readonly userAgent: string;
@@ -10,7 +11,7 @@ export class ExtensionStateService {
   private _sessionCounter: number;
   private _nextSessionId: number;
 
-  constructor(navigator: Navigator) {
+  constructor(navigator: Navigator, private backgroundPort: any, private cookiesMap: CookiesMap) {
     this.isolatedSessions = [];
     this.hashedSessions = [];
     this._sessionCounter = 1;
@@ -71,27 +72,56 @@ export class ExtensionStateService {
     delete this.hashedSessions[tabIdToRemove];
   }
 
-  setCookieItemInLocalStorage(cookieString, sessionTokenId) {
+  // cookieString is like "name=value; expires=...; path=..."
+  setSingleCookieState(cookieString: string, sessionTokenId: string): string {
+    // TODO: JS code can also set expire=* or path=* that now is not managed
+
     const cookieArray = localStorage.getItem(sessionTokenId) ? localStorage.getItem(sessionTokenId).split(constants.cookiesStringSeparator) : [];
-    const cookieArrayNew = cookieString.split(constants.cookiesStringSeparator);
+    const cookieArrayNew = cookieString.split(";");
     const map = new Map();
     for (const cookie of cookieArray) {
       const cookieParts = cookie.split("=");
-      const cookieName = cookieParts[0];
-      const cookieValue = cookieParts[1];
+      const cookieName = cookieParts[0].trim();
+      const cookieValue = cookieParts[1] ? cookieParts[1].trim() : undefined;
       map.set(cookieName, cookieValue);
     }
     for (const cookie of cookieArrayNew) {
       const cookieParts = cookie.split("=");
-      const cookieName = cookieParts[0];
-      const cookieValue = cookieParts[1];
-      map.set(cookieName, cookieValue);
+      const cookieName = cookieParts[0].trim();
+      const cookieValue = cookieParts[1] ? cookieParts[1].trim() : undefined;
+      if (cookieName.toLowerCase() !== "path" && cookieName.toLowerCase() !== "expires") {
+        map.set(cookieName, cookieValue);
+      } else {
+        console.log(`AWS is fucking with cookies: ${cookie}`);
+      }
     }
     const resultCookies = [];
     for (const entry of map.keys()) {
       const res = map.get(entry);
       resultCookies.push(res !== undefined ? `${entry}=${res}` : entry);
     }
-    localStorage.setItem(sessionTokenId, resultCookies.join(constants.cookiesStringSeparator));
+    const cookiesString = resultCookies.join(constants.cookiesStringSeparator);
+    localStorage.setItem(sessionTokenId, cookiesString);
+    return cookiesString;
+  }
+
+  synchronizeCookies(cookies: string, sessionTokenId: string, environment: "background-script" | "content-script", tabId?: number) {
+    if (environment === "content-script") {
+      try {
+        this.backgroundPort.postMessage({ request: "set-cookies-request", cookies, sessionTokenId }, () => {});
+        console.log("Sending cookies from content script to bg script");
+        console.log(new Date().getTime());
+      } catch (error) {
+        console.warn(error);
+      }
+    } else if (environment === "background-script") {
+      try {
+        chrome.tabs.sendMessage(tabId, { request: "set-cookies-request", cookies, sessionTokenId }, () => {});
+        console.log(`Sending cookies from bg script to content script (tabid:${tabId})`);
+        console.log(new Date().getTime());
+      } catch (error) {
+        console.warn(error);
+      }
+    }
   }
 }
