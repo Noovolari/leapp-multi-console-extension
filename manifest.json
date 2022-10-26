@@ -23,17 +23,14 @@
   },
   "permissions": [
     "contextualIdentities",
-    "contextMenus",
     "tabs",
     "cookies",
-    "storage",
-    "http://*/*",
-    "https://*/*",
     "activeTab",
     "webRequest",
     "webRequestBlocking",
-    "webNavigation",
-    "<all_urls>"
+    "https://*.awsapps.com/*",
+    "https://*.cloudfront.net/*",
+    "https://*.aws.amazon.com/*"
   ],
   "content_scripts": [
     {
@@ -45,7 +42,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "leapp@extension.com"
+      "id": "leapp-extension@noovolari.com"
     }
   }
 }
