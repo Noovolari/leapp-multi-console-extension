@@ -1,11 +1,11 @@
 {
   "name": "leapp-browser-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
   },
-  "description": "Leapp Browser Extension",
+  "description": "Leapp Multi-Console Extension",
   "repository": "https://github.com/Noovolari/leapp-browser-extension",
   "private": true,
   "homepage": "https://leapp.cloud",
