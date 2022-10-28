@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+  "name": "Leapp Multi-Console Extension",
+  "version": "0.1.2",
+  "description": "Leapp Multi AWS Console Browser Extension",
+  "icons": {
+    "16": "icons/icon_16.png",
+    "32": "icons/icon_32.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/icon_16.png",
+      "32": "icons/icon_32.png"
+    },
+    "default_title": "Leapp Browser Extension",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": [ "background-script.js" ],
+    "persistent": true
+  },
+  "permissions": [
+    "tabs",
+    "cookies",
+    "activeTab",
+    "webRequest",
+    "webRequestBlocking",
+    "https://*.awsapps.com/*",
+    "https://*.cloudfront.net/*",
+    "https://*.aws.amazon.com/*"
+  ],
+  "content_scripts": [
+    {
+      "all_frames": true,
+      "matches": [ "https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*" ],
+      "run_at": "document_start",
+      "js": [ "content-script.js" ]
+    }
+  ]
+}

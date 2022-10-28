@@ -60,7 +60,8 @@ module.exports = (env, argv) => ({
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: "./manifest.json"
+          from: env.browser === "chrome" ? "manifest-chrome.json" : "manifest-firefox.json",
+          to: "./manifest.json"
         },
         {
           from: "**/*",
