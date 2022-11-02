@@ -16,7 +16,7 @@ Open `about:addons` then select **extensions from the side menu**, and click on 
 select the **debug addons** option, and click on **inspect**.
 
 ### Other commands
-- `npm run build` : bundle the extension using **webpack** without starting any Browser instance.
+- `npm run build-chrome`/`npm run build-firefox` : bundle the extension for Chrome/Firefox using **webpack** without starting any Browser instance.
 - `npm run watch` : watch extension code for any changes. Use it after running `chrome-dev` or `firefox-dev`
 to **hot reload** the extension while testing it.
 
@@ -26,5 +26,12 @@ to **hot reload** the extension while testing it.
 - `src` : 
   - **backend** : contains `background` and `content` scripts.
   - **frontend** : contains the `popup` page and all related content (.html, .js, and .css).
-- `manifest.json` : entry point for the extension; contains metadata about the extension as 
+- `manifest-chrome.json`/`manifest-firefox.json` : entry point for the extension; contains metadata about the extension as 
 well as configuration and permission properties. [Link](https://developer.chrome.com/docs/extensions/mv2/manifest/)
+
+## Build Instructions
+- Install node and npm
+- Run `npm install`
+- Run `npm run build-firefox` or `npm run build-chrome`
+- The extension code should be inside the newly created `build` folder
+- Otherwise, to test it locally, run `npm run firefox-dev` or `npm run chrome-dev`
