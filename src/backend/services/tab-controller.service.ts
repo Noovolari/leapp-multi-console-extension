@@ -10,13 +10,12 @@ export class TabControllerService {
 
   openNewSessionTab(leappPayload: LeappSessionInfo): void {
     const sessionId = this.state.sessionCounter;
-    const sessionKey = `session-${sessionId}`;
     this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined });
     this.state.nextSessionId = this.state.sessionCounter++;
     if (this.state.isChrome) {
       this.newChromeSessionTab(leappPayload.url);
     } else {
-      this.newFirefoxSessionTab(leappPayload.url, sessionKey).then(() => {});
+      this.newFirefoxSessionTab(leappPayload.url, `${leappPayload.sessionName} (${leappPayload.sessionRole})`, sessionId).then(() => {});
     }
   }
 
@@ -26,8 +25,9 @@ export class TabControllerService {
     });
   }
 
-  private async newFirefoxSessionTab(url: string, sessionKey: string) {
-    const container = await this.getBrowser().contextualIdentities.create({ name: sessionKey, color: "orange", icon: "circle" });
+  private async newFirefoxSessionTab(url: string, containerName: string, sessionId: number) {
+    const container = await this.getBrowser().contextualIdentities.create({ name: containerName, color: "orange", icon: "circle" });
+    this.state.setCookieStoreId(sessionId, container.cookieStoreId);
     await this.getBrowser().tabs.create({
       url,
       cookieStoreId: container.cookieStoreId,

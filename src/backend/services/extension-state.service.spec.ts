@@ -82,8 +82,9 @@ describe("ExtensionStateService", () => {
     expect(service.hashedSessions).toEqual([undefined, undefined, 234]);
   });
 
-  test("removeTabFromSession", () => {
+  test("removeTabFromSession, Chrome user agent", () => {
     service.hashedSessions = [10, 20, 30, 20];
+    jest.spyOn(service, "isFirefox", "get").mockImplementation(() => false);
 
     service.isolatedSessions = [
       { sessionId: 10, tabsList: [0] },
@@ -99,5 +100,61 @@ describe("ExtensionStateService", () => {
       { sessionId: 20, tabsList: [3] },
       { sessionId: 30, tabsList: [2] },
     ]);
+  });
+
+  test("removeTabFromSession, Firefox user agent, tab removed from an isolated session is not the last", () => {
+    service.hashedSessions = [10, 20, 30, 20];
+    jest.spyOn(service, "isFirefox", "get").mockImplementation(() => true);
+
+    service.isolatedSessions = [
+      { sessionId: 10, tabsList: [0], cookieStoreId: "firefox-container-1" },
+      { sessionId: 20, tabsList: [1, 3], cookieStoreId: "firefox-container-2" },
+      { sessionId: 30, tabsList: [2], cookieStoreId: "firefox-container-3" },
+    ];
+
+    service.removeTabFromSession(1);
+
+    expect(service.hashedSessions).toEqual([10, undefined, 30, 20]);
+    expect(service.isolatedSessions).toEqual([
+      { sessionId: 10, tabsList: [0], cookieStoreId: "firefox-container-1" },
+      { sessionId: 20, tabsList: [3], cookieStoreId: "firefox-container-2" },
+      { sessionId: 30, tabsList: [2], cookieStoreId: "firefox-container-3" },
+    ]);
+  });
+
+  test("removeTabFromSession, Firefox user agent, tab removed from an isolated session is the last", () => {
+    service.hashedSessions = [10, 20, 30, 20];
+    jest.spyOn(service, "isFirefox", "get").mockImplementation(() => true);
+
+    service.isolatedSessions = [
+      { sessionId: 10, tabsList: [0], cookieStoreId: "firefox-container-1" },
+      { sessionId: 20, tabsList: [1, 3], cookieStoreId: "firefox-container-2" },
+      { sessionId: 30, tabsList: [2], cookieStoreId: "firefox-container-3" },
+    ];
+
+    const removeMock = jest.fn(async () => {});
+    service.getBrowser = () => ({ contextualIdentities: { remove: removeMock } });
+
+    service.removeTabFromSession(0);
+
+    expect(service.hashedSessions).toEqual([undefined, 20, 30, 20]);
+    expect(service.isolatedSessions).toEqual([
+      { sessionId: 10, tabsList: [], cookieStoreId: "firefox-container-1" },
+      { sessionId: 20, tabsList: [1, 3], cookieStoreId: "firefox-container-2" },
+      { sessionId: 30, tabsList: [2], cookieStoreId: "firefox-container-3" },
+    ]);
+    expect(removeMock).toHaveBeenCalledWith("firefox-container-1");
+  });
+
+  test("setCookieStoreId", () => {
+    service.isolatedSessions = [{ sessionId: 1, tabsList: [], cookieStoreId: undefined }];
+    service.setCookieStoreId(1, "firefox-container-1");
+    expect(service.isolatedSessions).toEqual([{ sessionId: 1, tabsList: [], cookieStoreId: "firefox-container-1" }]);
+  });
+
+  test("getBrowser", () => {
+    (global as any).browser = "browser";
+    const browser = service.getBrowser();
+    expect(browser).toBe("browser");
   });
 });

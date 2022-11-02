@@ -22,6 +22,6 @@ export class BootstrapService {
         });
       });
     };
-    chrome.runtime.setUninstallURL("https://docs.leapp.cloud/latest/built-in-features/multi-console/#uninstall-the-extension");
+    this.chromeNamespace.runtime.setUninstallURL("https://docs.leapp.cloud/latest/built-in-features/multi-console/#uninstall-the-extension");
   }
 }

@@ -28,6 +28,7 @@ describe("TabControllerService", () => {
       addTabToSession: jest.fn(),
       removeTabFromSession: jest.fn(),
       getSessionIdByTabId: jest.fn(() => 147),
+      setCookieStoreId: jest.fn(),
     };
 
     service = new TabControllerService(chromeNamespace, state);
@@ -51,14 +52,18 @@ describe("TabControllerService", () => {
   });
 
   test("openNewSessionTab, isChrome returns false", () => {
-    const leappPayload: any = { fakeKey: "fake-value", url: "fake-url" };
+    const leappPayload: any = { sessionName: "fake-name", sessionRole: "fake-role", url: "fake-url" };
     state.isChrome = false;
     service.newFirefoxSessionTab = jest.fn(() => ({ then: jest.fn() }));
     service.openNewSessionTab(leappPayload);
 
     expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined });
     expect(state.nextSessionId).toBe(0);
-    expect(service.newFirefoxSessionTab).toHaveBeenCalledWith("fake-url", "session-0");
+    expect(service.newFirefoxSessionTab).toHaveBeenCalledWith(
+      "fake-url",
+      `${leappPayload.sessionName} (${leappPayload.sessionRole})`,
+      state.sessionCounter - 1
+    );
   });
 
   test("newChromeSessionTab", () => {
@@ -69,22 +74,25 @@ describe("TabControllerService", () => {
   });
 
   test("newFirefoxSessionTab", async () => {
+    const sessionId = "fake-session-id";
     const url = "fake-url";
-    const sessionKey = "fake-session-key";
+    const containerName = "fake-container-key";
     const container = { cookieStoreId: "fake-cookie-store-id" };
     const browser = {
       contextualIdentities: { create: jest.fn(() => container) },
       tabs: { create: jest.fn() },
     };
+    state.setCookieStoreId = jest.fn(() => {});
     service.getBrowser = jest.fn(() => browser);
 
-    await service.newFirefoxSessionTab(url, sessionKey);
+    await service.newFirefoxSessionTab(url, containerName, sessionId);
 
-    expect(browser.contextualIdentities.create).toHaveBeenCalledWith({ name: sessionKey, color: "orange", icon: "circle" });
+    expect(browser.contextualIdentities.create).toHaveBeenCalledWith({ name: containerName, color: "orange", icon: "circle" });
     expect(browser.tabs.create).toHaveBeenCalledWith({
       url,
       cookieStoreId: container.cookieStoreId,
     });
+    expect(state.setCookieStoreId).toHaveBeenCalledWith(sessionId, container.cookieStoreId);
   });
 
   test("listen", () => {

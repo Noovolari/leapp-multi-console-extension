@@ -17,6 +17,10 @@ export class ExtensionStateService {
     this.userAgent = navigator.userAgent;
   }
 
+  getBrowser(): any {
+    return browser;
+  }
+
   get isChrome(): boolean {
     return this.userAgent.includes("Chrome");
   }
@@ -68,5 +72,15 @@ export class ExtensionStateService {
     const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
     isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
     delete this.hashedSessions[tabIdToRemove];
+    if (this.isFirefox && isolatedSession.tabsList.length === 0) {
+      this.getBrowser()
+        .contextualIdentities.remove(isolatedSession.cookieStoreId)
+        .then(() => {});
+    }
+  }
+
+  setCookieStoreId(sessionId: number, cookieStoreId: string): void {
+    const selectedIsolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
+    selectedIsolatedSession.cookieStoreId = cookieStoreId;
   }
 }

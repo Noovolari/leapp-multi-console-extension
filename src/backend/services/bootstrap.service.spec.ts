@@ -31,6 +31,7 @@ describe("BootstrapService", () => {
       tabs: { query: jest.fn((_queryInfo, callback) => callback(tabs)) },
       windows: { WINDOW_ID_CURRENT: 123 },
       cookies: { getAll: jest.fn((_details, callback) => callback(cookies)), remove: jest.fn((_details, callback) => callback()) },
+      runtime: { setUninstallURL: jest.fn(() => {}) },
     };
     state = {
       createNewIsolatedSession: jest.fn(),
@@ -50,6 +51,9 @@ describe("BootstrapService", () => {
     expect(state.addTabToSession).toHaveBeenNthCalledWith(1, 123, 0);
     expect(state.addTabToSession).toHaveBeenNthCalledWith(2, 456, 0);
     expect(state.addTabToSession).toHaveBeenNthCalledWith(3, 789, 0);
+    expect(chromeNamespace.runtime.setUninstallURL).toHaveBeenCalledWith(
+      "https://docs.leapp.cloud/latest/built-in-features/multi-console/#uninstall-the-extension"
+    );
     expect(chromeNamespace.cookies.getAll).toHaveBeenCalledWith({}, expect.any(Function));
     expect(chromeNamespace.cookies.remove).toHaveBeenCalledTimes(2);
     expect(chromeNamespace.cookies.remove).toHaveBeenNthCalledWith(

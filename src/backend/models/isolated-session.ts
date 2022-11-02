@@ -4,4 +4,5 @@ export interface IsolatedSession {
   sessionId: number;
   tabsList: number[];
   leappSession: LeappSessionInfo;
+  cookieStoreId?: string;
 }
