@@ -2,13 +2,27 @@ import * as constants from "../models/constants";
 import { ExtensionStateService } from "./extension-state.service";
 
 export class CustomDocumentCookieEventsService {
-  constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private state: ExtensionStateService) {}
+  private sessionToken: string;
+  private _isAlreadyBootstrapped: boolean;
+
+  constructor(private injectedDocument: Document, private injectedLocalStorage: Storage, private state: ExtensionStateService) {
+    this._isAlreadyBootstrapped = false;
+  }
 
   listen(): void {
+    this._isAlreadyBootstrapped = true;
     const injectableScript = this.generateCookieSetterGetterOverwriteScript();
     this.injectScriptInDocument(injectableScript);
     this.injectedDocument.addEventListener(constants.setCustomCookieEventString, (event) => this.customSetCookieEventHandler(event));
     this.injectedDocument.addEventListener(constants.getCustomCookieEventString, () => this.customGetCookieEventHandler());
+  }
+
+  isAlreadyBootstrapped(): boolean {
+    return this._isAlreadyBootstrapped;
+  }
+
+  setSessionToken(sessionToken: string): void {
+    this.sessionToken = sessionToken;
   }
 
   private injectScriptInDocument(injectableScript: string) {
@@ -36,10 +50,9 @@ export class CustomDocumentCookieEventsService {
       "          let cookies;\n" +
       "\n" +
       "          try {\n" +
-      `            cookies = localStorage.getItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
-      `            localStorage.removeItem("${constants.sessionsCookiesLocalStorageSelector}");\n` +
+      `            cookies = localStorage.getItem("${this.sessionToken}");\n` +
       "          } catch (e) {\n" +
-      `            cookies = document.getElementById("${constants.sessionsCookiesLocalStorageSelector}").innerText;\n` +
+      `            cookies = document.getElementById("${this.sessionToken}").innerText;\n` +
       "          }\n" +
       "\n" +
       "          return cookies;\n" +
@@ -84,12 +97,12 @@ export class CustomDocumentCookieEventsService {
   private customGetCookieEventHandler(): void {
     const cookiesString = this.getCookiesString();
     try {
-      this.injectedLocalStorage.setItem(constants.sessionsCookiesLocalStorageSelector, cookiesString);
+      this.injectedLocalStorage.setItem(this.sessionToken, cookiesString);
     } catch (err) {
-      let cookiesElement = this.injectedDocument.getElementById(constants.sessionsCookiesLocalStorageSelector);
+      let cookiesElement = this.injectedDocument.getElementById(this.sessionToken);
       if (!cookiesElement) {
         cookiesElement = this.injectedDocument.createElement("div");
-        cookiesElement.setAttribute("id", constants.sessionsCookiesLocalStorageSelector);
+        cookiesElement.setAttribute("id", this.sessionToken);
         this.injectedDocument.documentElement.appendChild(cookiesElement);
         cookiesElement.style.display = "none";
       }

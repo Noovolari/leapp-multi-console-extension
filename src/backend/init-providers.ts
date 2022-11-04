@@ -26,7 +26,11 @@ export function initProviders(): Providers {
 
   providers.webSocketService = new WebsocketService(providers.tabControllerService, WebSocket, providers.webRequestService);
 
-  providers.extractSessionIdService = new ExtractSessionIdService(providers.internalCommunicationService, providers.extensionStateService);
+  providers.extractSessionIdService = new ExtractSessionIdService(
+    providers.internalCommunicationService,
+    providers.extensionStateService,
+    providers.customDocumentCookieEventsService
+  );
 
   providers.popupCommunicationService = new PopupCommunicationService(chrome, providers.extensionStateService);
 
