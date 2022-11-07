@@ -16,6 +16,7 @@ module.exports = (env, argv) => ({
     path: PATHS.build,
     // the filename template for entry chunks
     filename: "[name].js",
+    clean: true,
   },
   devtool: argv.mode === "production" ? false : "source-map",
   resolve: {
@@ -71,6 +72,10 @@ module.exports = (env, argv) => ({
           from: "**/*.html",
           context: "src/frontend",
         },
+        ...(env.browser === "chrome" ? [{
+          from: "chromium-readme.txt",
+          to: "./README.txt"
+        }] : []),
       ],
     }),
     // Extract CSS into separate files
