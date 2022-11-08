@@ -8,15 +8,35 @@ export class TabControllerService {
     return browser;
   }
 
-  openNewSessionTab(leappPayload: LeappSessionInfo): void {
+  openOrFocusSessionTab(leappPayload: LeappSessionInfo, leappSessionId?: string): void {
     const sessionId = this.state.sessionCounter;
-    this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined });
+    this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined }, leappSessionId);
     this.state.nextSessionId = this.state.sessionCounter++;
+    if (leappSessionId) {
+      const tabId = this.state.getTabIdByLeappSessionId(leappSessionId);
+      if (tabId) {
+        this.focusSessionTab(tabId);
+      } else {
+        this.openSessionTab(sessionId, leappPayload);
+      }
+    } else {
+      this.openSessionTab(sessionId, leappPayload);
+    }
+  }
+
+  private openSessionTab(sessionId: number, leappPayload: LeappSessionInfo) {
     if (this.state.isChrome) {
       this.newChromeSessionTab(leappPayload.url);
     } else {
       this.newFirefoxSessionTab(leappPayload.url, `${leappPayload.sessionName} (${leappPayload.sessionRole})`, sessionId).then(() => {});
     }
+  }
+
+  private focusSessionTab(tabId: number) {
+    this.chromeNamespace.windows.getCurrent((window) => {
+      this.chromeNamespace.windows.update(window.id, { focused: true });
+      this.chromeNamespace.tabs.update(tabId, { active: true }, (_) => {});
+    });
   }
 
   private newChromeSessionTab(url: string) {

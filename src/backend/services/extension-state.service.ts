@@ -26,7 +26,7 @@ export class ExtensionStateService {
   }
 
   get isFirefox(): boolean {
-    return this.userAgent.includes("Mozilla");
+    return this.userAgent.includes("Firefox");
   }
 
   set sessionToken(value: string) {
@@ -57,9 +57,10 @@ export class ExtensionStateService {
     return this.hashedSessions[tabId];
   }
 
-  createNewIsolatedSession(sessionId: number, leappSession: LeappSessionInfo): void {
+  createNewIsolatedSession(sessionId: number, leappSession: LeappSessionInfo, leappSessionId?: string): void {
     const newIsolatedSession: IsolatedSession = { sessionId, leappSession, tabsList: [] };
     this.isolatedSessions.push(newIsolatedSession);
+    this.setLeappSessionId(sessionId, leappSessionId);
   }
 
   addTabToSession(tabId: number, sessionId: number): void {
@@ -71,6 +72,9 @@ export class ExtensionStateService {
     const sessionId = this.hashedSessions[tabIdToRemove];
     const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
     isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
+    if (isolatedSession.tabsList.length === 0) {
+      delete isolatedSession.leappSessionId;
+    }
     delete this.hashedSessions[tabIdToRemove];
     if (this.isFirefox && isolatedSession.tabsList.length === 0) {
       this.getBrowser()
@@ -82,5 +86,19 @@ export class ExtensionStateService {
   setCookieStoreId(sessionId: number, cookieStoreId: string): void {
     const selectedIsolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
     selectedIsolatedSession.cookieStoreId = cookieStoreId;
+  }
+
+  setLeappSessionId(sessionId: number, leappSessionId?: string): void {
+    const selectedIsolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
+    selectedIsolatedSession.leappSessionId = leappSessionId;
+  }
+
+  getTabIdByLeappSessionId(leappSessionId: string): number | undefined {
+    const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.leappSessionId === leappSessionId);
+    if (isolatedSession) {
+      return isolatedSession.tabsList[0];
+    } else {
+      return undefined;
+    }
   }
 }

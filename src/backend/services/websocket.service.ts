@@ -33,7 +33,8 @@ export class WebsocketService {
           const message = JSON.parse(event.data);
           if (message.type === "create-new-session") {
             const payload: LeappSessionInfo = message.sessionInfo;
-            this.tabControllerService.openNewSessionTab(payload);
+            const leappSessionId = message.leappSessionId;
+            this.tabControllerService.openOrFocusSessionTab(payload, leappSessionId);
             this.ws.send(JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
           } else if (message.type === "get-fetching-state") {
             const fetchingState = this.webRequestService?.fetching ?? FetchingState.notFetching;
