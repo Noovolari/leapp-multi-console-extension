@@ -66,6 +66,7 @@ describe("CustomDocumentCookieEventsService", () => {
   });
 
   test("generateCookieSetterGetterOverwriteScript", () => {
+    (service as any).sessionToken = "fake-session-token";
     const script = service.generateCookieSetterGetterOverwriteScript();
     const expectedScript =
       "(function () {\n" +
@@ -82,10 +83,9 @@ describe("CustomDocumentCookieEventsService", () => {
       "          let cookies;\n" +
       "\n" +
       "          try {\n" +
-      `            cookies = localStorage.getItem("##SESSION-COOKIES##");\n` +
-      `            localStorage.removeItem("##SESSION-COOKIES##");\n` +
+      `            cookies = localStorage.getItem("fake-session-token");\n` +
       "          } catch (e) {\n" +
-      `            cookies = document.getElementById("##SESSION-COOKIES##").innerText;\n` +
+      `            cookies = document.getElementById("fake-session-token").innerText;\n` +
       "          }\n" +
       "\n" +
       "          return cookies;\n" +
@@ -141,14 +141,16 @@ describe("CustomDocumentCookieEventsService", () => {
 
   test("customGetCookieEventHandler, with localStorage", () => {
     localStorage.setItem = jest.fn();
+    (service as any).sessionToken = "fake-session-token";
     service.getCookiesString = () => "cookies-string";
 
     service.customGetCookieEventHandler();
 
-    expect(localStorage.setItem).toHaveBeenCalledWith("##SESSION-COOKIES##", "cookies-string");
+    expect(localStorage.setItem).toHaveBeenCalledWith("fake-session-token", "cookies-string");
   });
 
   test("customGetCookieEventHandler, without localStorage, with cookies-element", () => {
+    (service as any).sessionToken = "fake-session-token";
     service.getCookiesString = () => "cookies-string";
     localStorage.setItem = () => {
       throw new Error("local storage not available");
@@ -158,11 +160,12 @@ describe("CustomDocumentCookieEventsService", () => {
 
     service.customGetCookieEventHandler();
 
-    expect(document.getElementById).toHaveBeenCalledWith("##SESSION-COOKIES##");
+    expect(document.getElementById).toHaveBeenCalledWith("fake-session-token");
     expect(cookiesElement).toEqual({ innerText: "cookies-string" });
   });
 
   test("customGetCookieEventHandler, without localStorage, cookies-element not found", () => {
+    (service as any).sessionToken = "fake-session-token";
     service.getCookiesString = () => "cookies-string";
     localStorage.setItem = () => {
       throw new Error("local storage not available");
@@ -175,7 +178,7 @@ describe("CustomDocumentCookieEventsService", () => {
     service.customGetCookieEventHandler();
 
     expect(document.createElement).toHaveBeenCalledWith("div");
-    expect(cookiesElement.setAttribute).toHaveBeenCalledWith("id", "##SESSION-COOKIES##");
+    expect(cookiesElement.setAttribute).toHaveBeenCalledWith("id", "fake-session-token");
     expect(document.documentElement.appendChild).toHaveBeenCalledWith(cookiesElement);
     expect(cookiesElement).toMatchObject({ innerText: "cookies-string", style: { display: "none" } });
   });

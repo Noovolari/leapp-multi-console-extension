@@ -17,7 +17,6 @@ describe("ContentScript", () => {
 
     await import("./content-script");
 
-    expect(providers.customDocumentCookieEventsService.listen).toHaveBeenCalled();
     expect(providers.extractSessionIdService.listen).toHaveBeenCalled();
   });
 
