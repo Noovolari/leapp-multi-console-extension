@@ -24,12 +24,12 @@ describe("ExtensionStateService", () => {
   });
 
   test("isFirefox", () => {
-    service.userAgent = "some text Mozilla some other";
+    service.userAgent = "some text Firefox some other";
     expect(service.isFirefox).toBe(true);
   });
 
-  test("isFirefox", () => {
-    service.userAgent = "some text mozilla some other";
+  test("isFirefox false", () => {
+    service.userAgent = "some text firefox some other";
     expect(service.isFirefox).toBe(false);
   });
 
@@ -156,5 +156,34 @@ describe("ExtensionStateService", () => {
     (global as any).browser = "browser";
     const browser = service.getBrowser();
     expect(browser).toBe("browser");
+  });
+
+  test("setLeappSessionId", () => {
+    service.isolatedSessions = [{ sessionId: 1, tabsList: [], cookieStoreId: undefined, leappSessionId: undefined }];
+    service.setLeappSessionId(1, "fake-leapp-session-id");
+    expect(service.isolatedSessions).toEqual([{ sessionId: 1, tabsList: [], cookieStoreId: undefined, leappSessionId: "fake-leapp-session-id" }]);
+  });
+
+  test("setLeappSessionId, for retrocompatibility leappSessionId isn't set", () => {
+    service.isolatedSessions = [{ sessionId: 1, tabsList: [], cookieStoreId: undefined, leappSessionId: undefined }];
+    service.setLeappSessionId(1);
+    expect(service.isolatedSessions).toEqual([{ sessionId: 1, tabsList: [], cookieStoreId: undefined, leappSessionId: undefined }]);
+  });
+
+  test("getTabIdByLeappSessionId", () => {
+    const leappSessionId = "fake-leapp-session-id";
+    service.isolatedSessions = [
+      { sessionId: 0, tabsList: [3], leappSessionId: "wrong-id" },
+      { sessionId: 1, tabsList: [1, 2], leappSessionId },
+    ];
+    const result = service.getTabIdByLeappSessionId(leappSessionId);
+    expect(result).toEqual(1);
+  });
+
+  test("getTabIdByLeappSessionId, no leappSessionId found", () => {
+    const leappSessionId = "wrong-leapp-session-id";
+    service.isolatedSessions = [{ sessionId: 0, tabsList: [3], leappSessionId: "leapp-session-id" }];
+    const result = service.getTabIdByLeappSessionId(leappSessionId);
+    expect(result).toEqual(undefined);
   });
 });

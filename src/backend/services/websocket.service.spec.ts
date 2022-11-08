@@ -14,7 +14,7 @@ describe("WebsocketService", () => {
   };
 
   beforeEach(() => {
-    tabControllerService = { openNewSessionTab: jest.fn() };
+    tabControllerService = { openOrFocusSessionTab: jest.fn() };
     webRequestService = { fetching: "fake-fetching" };
     fakeWebSocket = {
       onopen: undefined,
@@ -71,7 +71,7 @@ describe("WebsocketService", () => {
       expect(console.log).toHaveBeenCalledWith("connecting to websocket...");
 
       service.ws.onmessage({ data: '{"type":"create-new-session","sessionInfo":"fake-session-info"}' });
-      expect(tabControllerService.openNewSessionTab).toHaveBeenCalledWith("fake-session-info");
+      expect(tabControllerService.openOrFocusSessionTab).toHaveBeenCalledWith("fake-session-info", undefined);
       expect(service.ws.send).toHaveBeenNthCalledWith(1, JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
 
       service.ws.onmessage({ data: '{"type":"get-fetching-state"}' });
@@ -116,7 +116,7 @@ describe("WebsocketService", () => {
       expect(console.log).toHaveBeenCalledWith("connecting to websocket...");
 
       service.ws.onmessage({ data: '{"type":"create-new-session","sessionInfo":"fake-session-info"}' });
-      expect(tabControllerService.openNewSessionTab).toHaveBeenCalledWith("fake-session-info");
+      expect(tabControllerService.openOrFocusSessionTab).toHaveBeenCalledWith("fake-session-info", undefined);
       expect(service.ws.send).toHaveBeenNthCalledWith(1, JSON.stringify({ type: "success", msg: "payload from Leapp received correctly" }));
 
       service.ws.onmessage({ data: '{"type":"get-fetching-state"}' });

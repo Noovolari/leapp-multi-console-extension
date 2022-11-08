@@ -6,10 +6,12 @@ describe("TabControllerService", () => {
   let service: any;
 
   const tab = { openerTabId: "fake-opener-tab-id", id: 456 };
+  const window = { id: "fake-window-id" };
   const tabWithoutOpenerTabId = { id: 789 };
-  const tabId = 123;
+  let tabId;
 
   beforeEach(() => {
+    tabId = 123;
     chromeNamespace = {
       tabs: {
         create: jest.fn(),
@@ -19,6 +21,11 @@ describe("TabControllerService", () => {
             callback(tabId);
           }),
         },
+        update: jest.fn(),
+      },
+      windows: {
+        update: jest.fn(),
+        getCurrent: jest.fn((callback) => callback(window)),
       },
     };
     state = {
@@ -29,6 +36,7 @@ describe("TabControllerService", () => {
       removeTabFromSession: jest.fn(),
       getSessionIdByTabId: jest.fn(() => 147),
       setCookieStoreId: jest.fn(),
+      getTabIdByLeappSessionId: jest.fn(() => tabId),
     };
 
     service = new TabControllerService(chromeNamespace, state);
@@ -40,30 +48,69 @@ describe("TabControllerService", () => {
     expect(browser).toBe("browser");
   });
 
-  test("openNewSessionTab, isChrome returns true", () => {
+  test("openOrFocusSessionTab, tabId is defined", () => {
+    const leappSessionId = "fake-leapp-session-id";
     const leappPayload: any = { fakeKey: "fake-value", url: "fake-url" };
+    service.focusSessionTab = jest.fn();
+    service.openOrFocusSessionTab(leappPayload, leappSessionId);
+    expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined }, leappSessionId);
+    expect(state.nextSessionId).toBe(0);
+    expect(state.getTabIdByLeappSessionId).toHaveBeenCalledWith(leappSessionId);
+    expect(service.focusSessionTab).toHaveBeenCalledWith(tabId);
+  });
+
+  test("openOrFocusSessionTab, tabId is undefined", () => {
+    tabId = undefined;
+    const leappSessionId = "fake-leapp-session-id-2";
+    const leappPayload: any = {};
+    service.openSessionTab = jest.fn();
+    service.openOrFocusSessionTab(leappPayload, leappSessionId);
+    expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined }, leappSessionId);
+    expect(state.nextSessionId).toBe(0);
+    expect(state.getTabIdByLeappSessionId).toHaveBeenCalledWith(leappSessionId);
+    expect(service.openSessionTab).toHaveBeenCalledWith(0, leappPayload);
+  });
+
+  test("openOrFocusSessionTab, no Leapp Session Id for retrocompatibility", () => {
+    const leappSessionId = undefined;
+    const leappPayload: any = {};
+    service.openSessionTab = jest.fn();
+    service.openOrFocusSessionTab(leappPayload, leappSessionId);
+    expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined }, leappSessionId);
+    expect(state.nextSessionId).toBe(0);
+    expect(service.openSessionTab).toHaveBeenCalledWith(0, leappPayload);
+  });
+
+  test("openSessionTab, isChrome returns true", () => {
+    const leappPayload: any = { sessionName: "fake-name", sessionRole: "fake-role", url: "fake-url" };
     state.isChrome = true;
     service.newChromeSessionTab = jest.fn();
-    service.openNewSessionTab(leappPayload);
-
-    expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined });
-    expect(state.nextSessionId).toBe(0);
+    service.openSessionTab("fake-session-id" as any, leappPayload);
     expect(service.newChromeSessionTab).toHaveBeenCalledWith("fake-url");
   });
 
-  test("openNewSessionTab, isChrome returns false", () => {
+  test("openSessionTab, isChrome returns false", () => {
+    const sessionId = "fake-session-id";
     const leappPayload: any = { sessionName: "fake-name", sessionRole: "fake-role", url: "fake-url" };
     state.isChrome = false;
     service.newFirefoxSessionTab = jest.fn(() => ({ then: jest.fn() }));
-    service.openNewSessionTab(leappPayload);
+    service.openSessionTab("fake-session-id" as any, leappPayload);
+    expect(service.newFirefoxSessionTab).toHaveBeenCalledWith("fake-url", `${leappPayload.sessionName} (${leappPayload.sessionRole})`, sessionId);
+  });
 
-    expect(state.createNewIsolatedSession).toHaveBeenCalledWith(0, { ...leappPayload, url: undefined });
-    expect(state.nextSessionId).toBe(0);
-    expect(service.newFirefoxSessionTab).toHaveBeenCalledWith(
-      "fake-url",
-      `${leappPayload.sessionName} (${leappPayload.sessionRole})`,
-      state.sessionCounter - 1
-    );
+  test("focusSessionTab", () => {
+    const tabId = 2;
+    service.updateOnTabFocus = jest.fn();
+    service.focusSessionTab(tabId);
+    expect(chromeNamespace.windows.getCurrent).toHaveBeenCalled();
+    expect(service.updateOnTabFocus).toHaveBeenCalledWith(window, tabId);
+  });
+
+  test("updateOnTabFocus", () => {
+    const tabId = 2;
+    service.updateOnTabFocus(window, tabId);
+    expect(chromeNamespace.windows.update).toHaveBeenCalledWith(window.id, { focused: true });
+    expect(chromeNamespace.tabs.update).toHaveBeenCalledWith(tabId, { active: true }, expect.any(Function));
   });
 
   test("newChromeSessionTab", () => {

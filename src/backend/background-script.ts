@@ -11,5 +11,3 @@ providers.bootstrapService.listen();
 providers.internalCommunicationService.listenToContentScriptConnection();
 providers.popupCommunicationService.listen();
 providers.webSocketService.listen();
-
-(window as any).providers = providers;

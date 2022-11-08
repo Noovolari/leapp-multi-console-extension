@@ -32,11 +32,15 @@ export class TabControllerService {
     }
   }
 
-  private focusSessionTab(tabId: number) {
+  private focusSessionTab(tabId: number): void {
     this.chromeNamespace.windows.getCurrent((window) => {
-      this.chromeNamespace.windows.update(window.id, { focused: true });
-      this.chromeNamespace.tabs.update(tabId, { active: true }, (_) => {});
+      this.updateOnTabFocus(window, tabId);
     });
+  }
+
+  private updateOnTabFocus(window: any, tabId: number): void {
+    this.chromeNamespace.windows.update(window.id, { focused: true });
+    this.chromeNamespace.tabs.update(tabId, { active: true }, (_) => {});
   }
 
   private newChromeSessionTab(url: string) {
