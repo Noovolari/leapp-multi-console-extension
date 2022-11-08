@@ -57,13 +57,15 @@ describe("ExtensionStateService", () => {
   });
 
   test("createNewIsolatedSession", () => {
-    service.createNewIsolatedSession(123, "fake-session-info1");
-    expect(service.isolatedSessions).toEqual([{ sessionId: 123, leappSession: "fake-session-info1", tabsList: [] }]);
-
-    service.createNewIsolatedSession(234, "fake-session-info2");
+    service.createNewIsolatedSession(123, "fake-session-info1", "fake-leapp-session-id-1");
     expect(service.isolatedSessions).toEqual([
-      { sessionId: 123, leappSession: "fake-session-info1", tabsList: [] },
-      { sessionId: 234, leappSession: "fake-session-info2", tabsList: [] },
+      { sessionId: 123, leappSession: "fake-session-info1", tabsList: [], leappSessionId: "fake-leapp-session-id-1" },
+    ]);
+
+    service.createNewIsolatedSession(234, "fake-session-info2", "fake-leapp-session-id-2");
+    expect(service.isolatedSessions).toEqual([
+      { sessionId: 123, leappSession: "fake-session-info1", tabsList: [], leappSessionId: "fake-leapp-session-id-1" },
+      { sessionId: 234, leappSession: "fake-session-info2", tabsList: [], leappSessionId: "fake-leapp-session-id-2" },
     ]);
   });
 

@@ -58,9 +58,11 @@ export class ExtensionStateService {
   }
 
   createNewIsolatedSession(sessionId: number, leappSession: LeappSessionInfo, leappSessionId?: string): void {
-    const newIsolatedSession: IsolatedSession = { sessionId, leappSession, tabsList: [] };
-    this.isolatedSessions.push(newIsolatedSession);
-    this.setLeappSessionId(sessionId, leappSessionId);
+    if (!leappSessionId || !this.isolatedSessions.find((is) => is.leappSessionId === leappSessionId)) {
+      const newIsolatedSession: IsolatedSession = { sessionId, leappSession, tabsList: [] };
+      this.isolatedSessions.push(newIsolatedSession);
+      this.setLeappSessionId(sessionId, leappSessionId);
+    }
   }
 
   addTabToSession(tabId: number, sessionId: number): void {
@@ -73,9 +75,9 @@ export class ExtensionStateService {
     const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.sessionId === sessionId);
     isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
     if (isolatedSession.tabsList.length === 0) {
-      delete isolatedSession.leappSessionId;
+      isolatedSession.leappSessionId = undefined;
     }
-    delete this.hashedSessions[tabIdToRemove];
+    this.hashedSessions[tabIdToRemove] = undefined;
     if (this.isFirefox && isolatedSession.tabsList.length === 0) {
       this.getBrowser()
         .contextualIdentities.remove(isolatedSession.cookieStoreId)
