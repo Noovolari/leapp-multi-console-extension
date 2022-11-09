@@ -1,5 +1,6 @@
 import { ExtensionStateService } from "./extension-state.service";
 import { LeappSessionInfo } from "../models/leapp-session-info";
+import { containerColors } from "../models/container-colors";
 
 export class TabControllerService {
   constructor(private chromeNamespace: typeof chrome, private state: ExtensionStateService) {}
@@ -50,7 +51,12 @@ export class TabControllerService {
   }
 
   private async newFirefoxSessionTab(url: string, containerName: string, sessionId: number) {
-    const container = await this.getBrowser().contextualIdentities.create({ name: containerName, color: "orange", icon: "circle" });
+    const colorIndex = this.state.sessionCounter % containerColors.length;
+    const container = await this.getBrowser().contextualIdentities.create({
+      name: containerName,
+      color: containerColors[colorIndex],
+      icon: "circle",
+    });
     this.state.setCookieStoreId(sessionId, container.cookieStoreId);
     await this.getBrowser().tabs.create({
       url,
