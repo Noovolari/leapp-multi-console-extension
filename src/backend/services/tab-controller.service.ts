@@ -52,11 +52,19 @@ export class TabControllerService {
 
   private async newFirefoxSessionTab(url: string, containerName: string, sessionId: number) {
     const colorIndex = this.state.sessionCounter % containerColors.length;
-    const container = await this.getBrowser().contextualIdentities.create({
-      name: containerName,
-      color: containerColors[colorIndex],
-      icon: "circle",
-    });
+    const container = await this.getBrowser()
+      .contextualIdentities.query({
+        name: containerName,
+      })
+      .then(
+        (contexts) =>
+          contexts.pop() ||
+          this.getBrowser().contextualIdentities.create({
+            name: containerName,
+            color: containerColors[colorIndex],
+            icon: "circle",
+          })
+      );
     this.state.setCookieStoreId(sessionId, container.cookieStoreId);
     await this.getBrowser().tabs.create({
       url,
