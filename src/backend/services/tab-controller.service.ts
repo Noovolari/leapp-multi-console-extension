@@ -13,16 +13,7 @@ export class TabControllerService {
     const sessionId = this.state.sessionCounter;
     this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined }, leappSessionId);
     this.state.nextSessionId = this.state.sessionCounter++;
-    if (leappSessionId) {
-      const tabId = this.state.getTabIdByLeappSessionId(leappSessionId);
-      if (tabId) {
-        this.focusSessionTab(tabId);
-      } else {
-        this.openSessionTab(sessionId, leappPayload);
-      }
-    } else {
-      this.openSessionTab(sessionId, leappPayload);
-    }
+    this.openSessionTab(sessionId, leappPayload);
   }
 
   private openSessionTab(sessionId: number, leappPayload: LeappSessionInfo) {
