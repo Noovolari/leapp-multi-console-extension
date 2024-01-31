@@ -6,4 +6,5 @@ export interface LeappSessionInfo {
   sessionRegion: string;
   sessionRole: string;
   sessionType: LeappSessionType;
+  createdAt: number;
 }

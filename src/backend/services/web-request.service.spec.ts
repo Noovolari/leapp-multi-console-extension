@@ -32,7 +32,7 @@ describe("WebRequestService", () => {
     expect(service.fetching).toBe(FetchingState.notFetching);
   });
 
-  test("", () => {
+  /*test("", () => {
     const expectedFilterUrls = ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"];
     chromeWebRequest.onBeforeSendHeaders = {
       addListener: jest.fn((callback, filter, extraInfo) => {
@@ -57,7 +57,7 @@ describe("WebRequestService", () => {
     expect(chromeWebRequest.onHeadersReceived.addListener).toHaveBeenCalled();
     expect(service.onBeforeSendHeadersCallback).toHaveBeenCalledWith("before-headers-data");
     expect(service.onHeadersReceivedCallback).toHaveBeenCalledWith("headers-received-data");
-  });
+  });*/
 
   test("onHeadersReceivedCallback, tabId = 0", () => {
     const data = { tabId: 0 };

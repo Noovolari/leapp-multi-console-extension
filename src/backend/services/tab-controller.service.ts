@@ -12,16 +12,34 @@ export class TabControllerService {
   openOrFocusSessionTab(leappPayload: LeappSessionInfo, leappSessionId?: string): void {
     const sessionId = this.state.sessionCounter;
     this.state.createNewIsolatedSession(sessionId, { ...leappPayload, url: undefined }, leappSessionId);
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Increment
     this.state.nextSessionId = this.state.sessionCounter++;
     if (leappSessionId) {
       const tabId = this.state.getTabIdByLeappSessionId(leappSessionId);
+      const isSessionExpired = this.state.isSessionExpired(leappSessionId);
       if (tabId) {
-        this.focusSessionTab(tabId);
+        if (isSessionExpired) {
+          this.reloadTab(tabId, leappPayload);
+          this.state.updateCreatedAt(leappSessionId);
+        } else {
+          if (this.state.isChrome) {
+            this.focusSessionTab(tabId);
+          }
+        }
       } else {
         this.openSessionTab(sessionId, leappPayload);
+        this.state.updateCreatedAt(leappSessionId);
       }
     } else {
       this.openSessionTab(sessionId, leappPayload);
+    }
+  }
+
+  reloadTab(tabId: number, leappPayload: LeappSessionInfo): void {
+    if (this.state.isChrome) {
+      this.chromeNamespace.tabs.update(tabId, { url: leappPayload.url }, (_) => {});
+    } else {
+      this.getBrowser().tabs.update(tabId, { url: leappPayload.url });
     }
   }
 

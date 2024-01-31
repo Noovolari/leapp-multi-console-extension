@@ -103,4 +103,29 @@ export class ExtensionStateService {
       return undefined;
     }
   }
+
+  isSessionExpired(leappSessionId: string): boolean {
+    const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.leappSessionId === leappSessionId);
+    const msInASecond = 1000;
+    const secondsInAMinute = 60;
+    const minutesBeforeExpiration = 1;
+    if (isolatedSession) {
+      if (new Date().getTime() - isolatedSession.leappSession.createdAt < msInASecond * secondsInAMinute * minutesBeforeExpiration) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  updateCreatedAt(leappSessionId: string): void {
+    this.isolatedSessions = this.isolatedSessions.map((isolatedSession) => {
+      if (isolatedSession.leappSessionId === leappSessionId) {
+        isolatedSession.leappSession.createdAt = new Date().getTime();
+      }
+      return isolatedSession;
+    });
+  }
 }
