@@ -108,7 +108,7 @@ export class ExtensionStateService {
     const isolatedSession = this.isolatedSessions.find((isolatedSession) => isolatedSession.leappSessionId === leappSessionId);
     const msInASecond = 1000;
     const secondsInAMinute = 60;
-    const minutesBeforeExpiration = 1;
+    const minutesBeforeExpiration = 55;
     if (isolatedSession) {
       if (new Date().getTime() - isolatedSession.leappSession.createdAt < msInASecond * secondsInAMinute * minutesBeforeExpiration) {
         return false;
