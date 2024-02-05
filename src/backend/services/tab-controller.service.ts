@@ -104,14 +104,10 @@ export class TabControllerService {
         this.state.addTabToSession(tab.id, this.state.nextSessionId);
       }
       this.state.nextSessionId = 0;
-      console.log(`Tab ${tab.id} was created from ${tab.openerTabId ?? "Leapp"}`);
-    } else {
-      console.log("User created a new tab using plus button");
     }
   }
 
   private handleRemoved(tabId: number): void {
     this.state.removeTabFromSession(tabId, this.chromeNamespace.cookies);
-    console.log(`Tab ${tabId} was removed!`);
   }
 }

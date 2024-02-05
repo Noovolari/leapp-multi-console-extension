@@ -18,7 +18,9 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [ "background-script.js" ],
+    "scripts": [
+      "background-script.js"
+    ],
     "persistent": true
   },
   "permissions": [
@@ -29,14 +31,22 @@
     "webRequestBlocking",
     "https://*.awsapps.com/*",
     "https://*.cloudfront.net/*",
-    "https://*.aws.amazon.com/*"
+    "https://*.amazon.com/*",
+    "https://*.amazon.it/*"
   ],
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": [ "https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*" ],
+      "matches": [
+        "https://*.awsapps.com/*",
+        "https://*.cloudfront.net/*",
+        "https://*.amazon.com/*",
+        "https://*.amazon.it/*"
+      ],
       "run_at": "document_start",
-      "js": [ "content-script.js" ]
+      "js": [
+        "content-script.js"
+      ]
     }
   ]
 }

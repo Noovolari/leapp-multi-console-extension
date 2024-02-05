@@ -63,7 +63,6 @@ export class CustomDocumentCookieEventsService {
   }
 
   private customSetCookieEventHandler(event: any): void {
-    console.log("Custom Cookies Event: ", event);
     const cookie = event.detail;
     if (this.state.sessionToken === null || this.state.sessionToken === "" || this.state.sessionToken === undefined) {
       this.injectedDocument.cookie = cookie;

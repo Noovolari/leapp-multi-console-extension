@@ -79,18 +79,21 @@ export class ExtensionStateService {
     isolatedSession.tabsList = isolatedSession.tabsList.filter((tabId) => tabId !== tabIdToRemove);
     if (isolatedSession.tabsList.length === 0) {
       isolatedSession.leappSessionId = undefined;
-      console.log("No more tabs for session: " + sessionId);
-      console.log("Cleaning cookies for this session...");
       const sessionString = `${constants.leappToken}${sessionId}${constants.separatorToken}`;
       cookies.getAll({}, (unexpiredCookies: any[]) => {
         unexpiredCookies.forEach((uCookie) => {
-          console.log("Checking: " + uCookie.name + " for session: " + sessionId + " using: " + sessionString);
           // If the prefix of the cookie's name matches the one specified, remove it
           if (uCookie.name.indexOf(sessionString) !== -1) {
-            // Remove the cookie
-            cookies.remove({ name: uCookie.name, url: "https://" + uCookie.domain + uCookie.path, storeId: uCookie.storeId }, (detail: any) => {
-              console.log("removed: ", detail.name);
-            });
+            try {
+              const cookieDomain = uCookie.domain.startsWith(".") ? uCookie.domain.substring(1) : uCookie.domain;
+              // Remove the cookie
+              cookies.remove({
+                name: uCookie.name,
+                url: "https://" + cookieDomain + uCookie.path,
+              });
+            } catch (error) {
+              console.error(error);
+            }
           }
         });
       });

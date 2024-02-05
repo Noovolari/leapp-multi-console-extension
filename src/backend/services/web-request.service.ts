@@ -1,7 +1,13 @@
 import { ExtensionStateService } from "./extension-state.service";
 import * as constants from "../models/constants";
 
-const awsConsoleUrls = ["https://*.awsapps.com/*", "https://*.cloudfront.net/*", "https://*.aws.amazon.com/*"];
+const awsConsoleUrls = [
+  "https://*.awsapps.com/*",
+  "https://*.cloudfront.net/*",
+  "https://*.aws.amazon.com/*",
+  "https://*.amazon.com/*",
+  "https://*.amazon.it/*",
+];
 
 export enum FetchingState {
   notFetching,
@@ -81,7 +87,6 @@ export class WebRequestService {
       const responseHeaders = data.responseHeaders;
       const tabSessionId = this.state.getSessionIdByTabId(tabId);
       if (tabSessionId !== undefined && tabSessionId !== 0) {
-        // console.log("HEADER DATA: ", data);
         this.fetchingDate = new Date();
         for (const responseHeader of responseHeaders) {
           if (responseHeader.name.toLowerCase() === "set-cookie") {
