@@ -96,18 +96,22 @@ export class TabControllerService {
   }
 
   private handleCreated(tab: any): void {
-    if (tab.openerTabId) {
-      const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
-      this.state.addTabToSession(tab.id, currentSessionId);
+    if (tab.pendingUrl.indexOf("chrome://") === -1) {
+      if (tab.openerTabId) {
+        const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
+        this.state.addTabToSession(tab.id, currentSessionId);
+      } else {
+        this.state.addTabToSession(tab.id, this.state.nextSessionId);
+      }
+      this.state.nextSessionId = 0;
+      console.log(`Tab ${tab.id} was created from ${tab.openerTabId ?? "Leapp"}`);
     } else {
-      this.state.addTabToSession(tab.id, this.state.nextSessionId);
+      console.log("User created a new tab using plus button");
     }
-    this.state.nextSessionId = 0;
-    console.log(`Tab ${tab.id} was created from ${tab.openerTabId ?? "Leapp"}`);
   }
 
   private handleRemoved(tabId: number): void {
-    this.state.removeTabFromSession(tabId);
+    this.state.removeTabFromSession(tabId, this.chromeNamespace.cookies);
     console.log(`Tab ${tabId} was removed!`);
   }
 }
