@@ -96,7 +96,17 @@ export class TabControllerService {
   }
 
   private handleCreated(tab: any): void {
-    if (tab.pendingUrl.indexOf("chrome://") === -1) {
+    if (tab.pendingUrl) {
+      if (tab.pendingUrl.indexOf("chrome://") === -1) {
+        if (tab.openerTabId) {
+          const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
+          this.state.addTabToSession(tab.id, currentSessionId);
+        } else {
+          this.state.addTabToSession(tab.id, this.state.nextSessionId);
+        }
+        this.state.nextSessionId = 0;
+      }
+    } else {
       if (tab.openerTabId) {
         const currentSessionId = this.state.getSessionIdByTabId(tab.openerTabId);
         this.state.addTabToSession(tab.id, currentSessionId);
