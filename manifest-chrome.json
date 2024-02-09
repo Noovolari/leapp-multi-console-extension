@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Leapp Multi-Console Extension",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Leapp Multi AWS Console Browser Extension",
   "icons": {
     "16": "icons/icon_16.png",
